@@ -1,0 +1,10 @@
+{
+  "id": "T-GIT03",
+  "type": "script",
+  "target": "any",
+  "nonce": "NONCE-GIT-CONC-003",
+  "timeout": 600,
+  "created": "2026-10-02T02:28:27Z",
+  "note": "concurrency probe: how many pollers / lock behaviour / agent channel presence",
+  "files": {"script.sh": "7cf07b18b482767304ea3b61ecbe24361c1dd720991d2fe1e1cd793f8e7c2da5"}
+}
