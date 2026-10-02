@@ -1,0 +1,10 @@
+{
+  "id": "T-MSP01",
+  "type": "script",
+  "target": "muse",
+  "nonce": "NONCE-MSP01-001",
+  "timeout": 300,
+  "created": "2026-10-02T05:31:53Z",
+  "note": "Muse capability probe (read-only): tools/egress/agent-executor discovery",
+  "files": {"script.sh": "316d3d970f5b645b952eb91459490bad09d7ffda1907109b170cd206b340caeb"}
+}
