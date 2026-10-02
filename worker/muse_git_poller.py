@@ -42,7 +42,7 @@ import time
 import urllib.parse
 import urllib.request
 
-VER = "gitpoller-5"
+VER = "gitpoller-6"
 UA = "Mozilla/5.0 (X11; Linux x86_64)"
 ROLE = os.environ.get("BUS_ROLE", "muse")
 REPO = os.environ.get("BUS_REPO", "https://github.com/1432151545/newapi-tasks.git")
@@ -62,6 +62,13 @@ FLUSH_PER_CYCLE = 5
 HOST = os.uname().nodename
 NTFY_BASE = os.environ.get("BUS_NTFY_BASE", "https://ntfy.sh")
 NTFY_TOPIC = os.environ.get("BUS_NTFY_TOPIC", "")
+# 回执仓库：与任务库**彻底分离**，poller 绝不从这里读任务（只写 receipts/）。
+# 凭证：env BUS_RECEIPT_PAT > $STATE/receipt_pat (600)。无凭证则静默跳过该通道。
+RECEIPTS_REPO = os.environ.get("BUS_RECEIPTS_REPO",
+                               "https://github.com/1432151545/newapi-receipts.git")
+PAT_P = os.path.join(STATE, "receipt_pat")
+RDIR = os.path.join(STATE, "receipts-repo")
+assert REPO != RECEIPTS_REPO, "任务库与回执库必须是两个不同仓库"
 
 
 def log(m):
@@ -372,16 +379,88 @@ def write_outbox(slug, code, rec, tid):
     return ok
 
 
+def get_pat():
+    p = os.environ.get("BUS_RECEIPT_PAT", "")
+    if p:
+        return p.strip()
+    try:
+        return open(PAT_P, encoding="utf-8").read().strip()
+    except Exception:
+        return ""
+
+
+def git_receipt(rec, tid, payload):
+    """把回执推到独立的回执仓库（receipts/<tid>.*）。
+
+    安全边界：只 push 到 RECEIPTS_REPO，永不从中 fetch/pull 任务；
+    token 不落 .git/config（push 时临时拼 URL）。
+    """
+    pat = get_pat()
+    if not pat:
+        return False, "no pat"
+    url_plain = RECEIPTS_REPO
+    url_auth = re.sub(r"^https://", "https://%s@" % pat, url_plain)
+    try:
+        if not os.path.isdir(os.path.join(RDIR, ".git")):
+            rc, o = sh(["git", "clone", "-q", "--depth", "1", url_auth, RDIR], 180)
+            if rc != 0:
+                return False, "clone: %s" % o[-120:]
+            sh(["git", "-C", RDIR, "remote", "set-url", "origin", url_plain], 30)
+        else:
+            sh(["git", "-C", RDIR, "fetch", "-q", "--depth", "1", "origin", "main"], 120)
+            sh(["git", "-C", RDIR, "reset", "-q", "--hard", "FETCH_HEAD"], 60)
+        rd = os.path.join(RDIR, "receipts")
+        os.makedirs(rd, exist_ok=True)
+        with open(os.path.join(rd, "%s.rec" % tid), "w", encoding="utf-8") as f:
+            f.write(rec + "\n")
+        with open(os.path.join(rd, "%s.json" % tid), "w", encoding="utf-8") as f:
+            json.dump(payload, f, ensure_ascii=False, indent=1)
+        rc, o = sh(["git", "-C", RDIR, "add", "-A"], 60)
+        if rc != 0:
+            return False, "add: %s" % o[-120:]
+        rc, o = sh(["git", "-C", RDIR, "-c", "user.email=sandbox@%s" % HOST,
+                    "-c", "user.name=muse-poller",
+                    "commit", "-m", "receipt %s (%s)" % (tid, ROLE)], 60)
+        # 无改动时 commit 返回 1，属正常
+        if rc != 0 and "nothing to commit" not in o and "无文件要提交" not in o:
+            return False, "commit: %s" % o[-140:]
+        rc, o = sh(["git", "-C", RDIR, "push", "-q", url_auth, "HEAD:main"], 180)
+        if rc != 0:
+            return False, "push: %s" % o[-120:]
+        return True, "pushed"
+    except Exception as e:
+        return False, "err: %s" % str(e)[:110]
+
+
+def _rec_payload(rec):
+    """从 REC 串解出结果 JSON（队列里的历史回执也能用）。"""
+    try:
+        p = rec.split("|data=")[1]
+        return json.loads(base64.urlsafe_b64decode(p + "=" * (-len(p) % 4)))
+    except Exception:
+        return None
+
+
 def deliver(rec, tid, slug, code, topic):
-    """回执投递：**rentry outbox 优先**（沙箱实测可写、有 edit_code 保护），
-    ntfy 仅作备用通道（2026-10-02 实测沙箱出口对 ntfy.sh 全不通）。"""
-    if slug and code:
-        if write_outbox(slug, code, rec, tid):
-            return True
-        log("deliver %s via rentry FAILED, trying ntfy fallback" % tid)
+    """回执投递，按韧性排序（逐级回落，任一成功即止）：
+
+      1) **独立回执仓库（git）** —— 2026-10-02 实测最稳；需 PAT，无则跳过
+      2) rentry outbox —— 有 edit_code 保护，沙箱实测可写
+      3) ntfy —— 沙箱实测全不通，仅存以备
+
+    安全边界：第 1 条只写 RECEIPTS_REPO，永不从该库读任务；任务库对它保持只读。
+    """
+    rc_ok, why = git_receipt(rec, tid, _rec_payload(rec))
+    if rc_ok:
+        log("deliver %s via receipts-repo: OK" % tid)
+        return True
+    if why != "no pat":
+        log("deliver %s via receipts-repo FAIL: %s" % (tid, why))
+    if slug and code and write_outbox(slug, code, rec, tid):
+        return True
     if topic:
         ok, r = ntfy_post(topic, rec)
-        log("deliver %s via ntfy(fallback): %s" % (tid, "OK" if ok else "FAIL " + str(r)[:70]))
+        log("deliver %s via ntfy: %s" % (tid, "OK" if ok else "FAIL " + str(r)[:60]))
         return bool(ok)
     return False
 
