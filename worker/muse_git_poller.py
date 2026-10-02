@@ -42,7 +42,7 @@ import time
 import urllib.parse
 import urllib.request
 
-VER = "gitpoller-4"
+VER = "gitpoller-5"
 UA = "Mozilla/5.0 (X11; Linux x86_64)"
 ROLE = os.environ.get("BUS_ROLE", "muse")
 REPO = os.environ.get("BUS_REPO", "https://github.com/1432151545/newapi-tasks.git")
@@ -373,14 +373,16 @@ def write_outbox(slug, code, rec, tid):
 
 
 def deliver(rec, tid, slug, code, topic):
-    """回执投递：ntfy 优先（append-only、无 Cloudflare），失败回落 rentry outbox。"""
+    """回执投递：**rentry outbox 优先**（沙箱实测可写、有 edit_code 保护），
+    ntfy 仅作备用通道（2026-10-02 实测沙箱出口对 ntfy.sh 全不通）。"""
+    if slug and code:
+        if write_outbox(slug, code, rec, tid):
+            return True
+        log("deliver %s via rentry FAILED, trying ntfy fallback" % tid)
     if topic:
         ok, r = ntfy_post(topic, rec)
-        log("deliver %s via ntfy: %s" % (tid, "OK" if ok else "FAIL " + str(r)[:70]))
-        if ok:
-            return True
-    if slug and code:
-        return write_outbox(slug, code, rec, tid)
+        log("deliver %s via ntfy(fallback): %s" % (tid, "OK" if ok else "FAIL " + str(r)[:70]))
+        return ok
     return False
 
 
