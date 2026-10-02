@@ -1,0 +1,10 @@
+{
+  "id": "T-MUSE-LIVENESS01",
+  "type": "agent",
+  "target": "muse",
+  "nonce": "NONCE-MUSE-LIVENESS01-20261002",
+  "timeout": 1800,
+  "created": "2026-10-02T08:45:08Z",
+  "note": "Add native runtime Agent heartbeat and receipt resume without extra scheduler",
+  "files": {"prompt.md": "8ac0c43c7e3c2effe870b0444fee5bcddfdefeed71211eeb30f6f5a97814183f"}
+}
