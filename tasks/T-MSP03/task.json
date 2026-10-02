@@ -1,0 +1,10 @@
+{
+  "id": "T-MSP03",
+  "type": "script",
+  "target": "muse",
+  "nonce": "NONCE-MSP03-001",
+  "timeout": 500,
+  "created": "2026-10-02T05:39:49Z",
+  "note": "decisive codex probe: full flags + auth + one real minimal exec",
+  "files": {"script.sh": "bbd54522ea1dd60ed90df4002023126bf22a31d23ce917711910ea565134c6c3"}
+}
