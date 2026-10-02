@@ -15,7 +15,9 @@
   · 回执先入本地队列再投递：rentry 抖动时任务只执行一次，恢复后自动补发。
   · 回执通道 ntfy 优先、rentry 回落（2026-10-02）：rentry 前置 Cloudflare，共享代理
     出口 IP 会被挑战/限流（实测沙箱侧 half-hour 不通）；ntfy.sh 是裸 nginx、
-    append-only、支持增量读，跨网络实测可用。topic 由指针页 receipt_topic 下发。
+    append-only、支持增量读，跨网络实测可用。
+  · topic 发现链 **repo 优先**（worker/receipt_topic）> 本地缓存 > 指针页：
+    指针页在 rentry 上，恰是沙箱读不到的那个；git 通道才是沙箱永远能用的。
   · outbox 凭据带 30 分钟 TTL 缓存：不再每 60s 读一次指针页（省 rentry 配额）。
   · 不使用 systemd；调度由外部「单一 60s 循环」负责，本脚本不管调度。
 
@@ -40,7 +42,7 @@ import time
 import urllib.parse
 import urllib.request
 
-VER = "gitpoller-3"
+VER = "gitpoller-4"
 UA = "Mozilla/5.0 (X11; Linux x86_64)"
 ROLE = os.environ.get("BUS_ROLE", "muse")
 REPO = os.environ.get("BUS_REPO", "https://github.com/1432151545/newapi-tasks.git")
@@ -294,10 +296,36 @@ def build_rec(tid, nonce, ttype, rc, artifacts, note=""):
         base64.urlsafe_b64encode(rj).decode().rstrip("="))
 
 
+def _save_topic(t):
+    try:
+        d = _conf_read()
+        d["topic"] = t
+        os.makedirs(STATE, exist_ok=True)
+        with open(CONF_P, "w") as f:
+            for k, v in d.items():
+                f.write("%s=%s\n" % (k, v))
+        os.chmod(CONF_P, 0o600)
+    except Exception:
+        pass
+
+
 def get_topic():
-    """回执邮箱 topic：env > 本地缓存 > 指针页 receipt_topic。"""
+    """回执邮箱 topic 发现链：env > repo 下发 > 本地缓存 > 指针页。
+
+    关键：**repo 优先于指针页** —— 指针页在 rentry(Cloudflare)，沙箱出口
+    被挑战时读不到；而 git 通道对沙箱始终可用，所以 topic 由 repo 下发。
+    """
     if NTFY_TOPIC:
         return NTFY_TOPIC
+    try:
+        p = os.path.join(REPODIR, "worker", "receipt_topic")
+        if os.path.isfile(p):
+            t2 = open(p, encoding="utf-8").read().strip().splitlines()[0].strip()
+            if t2:
+                _save_topic(t2)
+                return t2
+    except Exception as e:
+        log("repo topic read failed: %s" % str(e)[:80])
     try:
         d = _conf_read()
         if d.get("topic"):
@@ -308,11 +336,7 @@ def get_topic():
         txt = textarea(PTR_SLUG)
         t2 = field(txt, "receipt_topic")
         if t2:
-            try:
-                with open(CONF_P, "a") as f:
-                    f.write("topic=%s\n" % t2)
-            except Exception:
-                pass
+            _save_topic(t2)
             return t2
     except Exception as e:
         log("pointer topic read failed: %s" % str(e)[:100])
