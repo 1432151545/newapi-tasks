@@ -382,7 +382,7 @@ def deliver(rec, tid, slug, code, topic):
     if topic:
         ok, r = ntfy_post(topic, rec)
         log("deliver %s via ntfy(fallback): %s" % (tid, "OK" if ok else "FAIL " + str(r)[:70]))
-        return ok
+        return bool(ok)
     return False
 
 
