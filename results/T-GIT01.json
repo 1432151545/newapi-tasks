@@ -1,0 +1,23 @@
+{
+  "task": "T-GIT01",
+  "sha_ok": true,
+  "verified_at": "2026-10-02T01:56:53Z",
+  "rec": "REC|task=T-GIT01|nonce=NONCE-GIT-BRIDGE-001|exit=0|type=script|ts=2026-10-02T01:52:03|host=htch-runtime|sha=641973a75a17651a819af91cca8a32dc876ac3e47590fce473727ec4796f5588|data=eyJ0YXNrX2lkIjogIlQtR0lUMDEiLCAibm9uY2UiOiAiTk9OQ0UtR0lULUJSSURHRS0wMDEiLCAidHlwZSI6ICJzY3JpcHQiLCAiZXhpdCI6IDAsICJ0cyI6ICIyMDI2LTEwLTAyVDAxOjUyOjAzIiwgIndvcmtlciI6ICJtdXNlIiwgImhvc3QiOiAiaHRjaC1ydW50aW1lIiwgImFydGlmYWN0cyI6IHsic2NyaXB0LmxvZyI6IHsic2hhMjU2IjogIjNiOTVmYjVkNTU0YjczYzMyMjczMGJhNmEwNjdiZjgwZGM1Yjk2NzM4Y2RlYjYwMjY4YmQyMTI1YTkyN2Q3ZjQiLCAic2l6ZSI6IDIzMywgImI2NCI6ICJTRVZNVEU4dGRtbGhMV2RwZENCdWIyNWpaVDFPVDA1RFJTMUhTVlF0UWxKSlJFZEZMVEF3TVNCMFlYTnJQVlF0UjBsVU1ERWdkSE05TWpBeU5pMHhNQzB3TWxRd01UbzFNam93TTFvS2FHOXpkRDFvZEdOb0xYSjFiblJwYldVZ2RYTmxjajF5YjI5MENuSmxjRzlmYUdWaFpEMWtNVGN5TkRaa0NuQnZiR3hsY2w5c2IyZGZkR0ZwYkRvS1d6SXdNall0TVRBdE1ESWdNREU2TlRJNk1ETmRXMmRwZEhCdmJHeGxjaTB4WFNBOVBUMGdZMnhoYVcxcGJtY2dWQzFIU1ZRd01TQW9kSGx3WlQxelkzSnBjSFFnZEdGeVoyVjBQV0Z1ZVNrZ1BUMDlDa0ZNVENCUFN3bz0ifX0sICJub3RlIjogImZpcnN0IHRhc2sgb3ZlciB0aGUgcHVibGljIGdpdCBjaGFubmVsIChuZXdhcGktdGFza3MpIn0",
+  "result": {
+    "task_id": "T-GIT01",
+    "nonce": "NONCE-GIT-BRIDGE-001",
+    "type": "script",
+    "exit": 0,
+    "ts": "2026-10-02T01:52:03",
+    "worker": "muse",
+    "host": "htch-runtime",
+    "artifacts": {
+      "script.log": {
+        "sha256": "3b95fb5d554b73c322730ba6a067bf80dc5b96738cdeb60268bd2125a927d7f4",
+        "size": 233,
+        "b64": "SEVMTE8tdmlhLWdpdCBub25jZT1OT05DRS1HSVQtQlJJREdFLTAwMSB0YXNrPVQtR0lUMDEgdHM9MjAyNi0xMC0wMlQwMTo1MjowM1oKaG9zdD1odGNoLXJ1bnRpbWUgdXNlcj1yb290CnJlcG9faGVhZD1kMTcyNDZkCnBvbGxlcl9sb2dfdGFpbDoKWzIwMjYtMTAtMDIgMDE6NTI6MDNdW2dpdHBvbGxlci0xXSA9PT0gY2xhaW1pbmcgVC1HSVQwMSAodHlwZT1zY3JpcHQgdGFyZ2V0PWFueSkgPT09CkFMTCBPSwo="
+      }
+    },
+    "note": "first task over the public git channel (newapi-tasks)"
+  }
+}
