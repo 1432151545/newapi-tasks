@@ -1,0 +1,10 @@
+{
+  "id": "T-MSP02",
+  "type": "script",
+  "target": "muse",
+  "nonce": "NONCE-MSP02-001",
+  "timeout": 300,
+  "created": "2026-10-02T05:35:15Z",
+  "note": "probe codex CLI non-interactive usage on Muse (read-only)",
+  "files": {"script.sh": "0b57453aae44a20ce8afe8982598bc4b01d68ede52d8ad95afcb08e6ee51f3bf"}
+}
