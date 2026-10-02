@@ -5,15 +5,23 @@
 流程：
   1) git fetch/pull 公共任务库（匿名 HTTPS；本地无 clone 则 clone）
   2) 自我更新：repo 内 worker/muse_git_poller.py 与本机副本比对，不同则替换并 re-exec
-  3) 加锁，扫描 tasks/*/task.json：跳过已完成（done）、target 不匹配、已过期
+  3) 加锁 → 补发遗留回执（pending_recs.json）→ 扫描 tasks/*/task.json
   4) 执行：type=script → bash script.sh（先校验 sha256）；type=agent → 入队 / BUS_EXEC
-  5) 组装 REC（与 HK bus_ctl verify 契约一致）→ 合并写回 outbox → 记 done
+  5) 组装 REC → 合并写回 outbox；写不进去就存本地待发队列，任务不重跑
+
+设计要点（2026-10-02 修订）：
+  · 日志只写 git_poller.log，不再 print —— 调用方的 `>> 同一文件` 会造成双份，
+    "并发认领"是假信号（flock 一直正常）。
+  · 回执先入本地队列再投递：rentry 抖动时任务只执行一次，恢复后自动补发。
+  · outbox 凭据带 30 分钟 TTL 缓存：不再每 60s 读一次指针页（省 rentry 配额）。
+  · 不使用 systemd；调度由外部「单一 60s 循环」负责，本脚本不管调度。
 
 环境变量（全有默认值，可不设）：
   BUS_ROLE      本机角色（默认 muse）        BUS_REPO     任务库 URL
   BUS_REPO_DIR  本地 clone 目录              BUS_STATE_DIR 状态目录（默认 ~/.hermes-gitbus）
   BUS_OUT_SLUG / BUS_OUT_CODE   直接指定回写页（默认从指针页运行时获取，本地缓存兜底）
   BUS_EXEC      type=agent 的执行器命令模板（{prompt_file} 占位）；不设则仅入队
+  BUS_LOG_ECHO=1                额外把日志打到 stdout（人工/修复时用）
 """
 import base64
 import fcntl
@@ -29,7 +37,7 @@ import time
 import urllib.parse
 import urllib.request
 
-VER = "gitpoller-1"
+VER = "gitpoller-2"
 UA = "Mozilla/5.0 (X11; Linux x86_64)"
 ROLE = os.environ.get("BUS_ROLE", "muse")
 REPO = os.environ.get("BUS_REPO", "https://github.com/1432151545/newapi-tasks.git")
@@ -38,22 +46,27 @@ REPODIR = os.path.expanduser(os.environ.get("BUS_REPO_DIR", os.path.join(STATE, 
 PTR_SLUG = os.environ.get("BUS_PTR_SLUG", "hermes-muse-ptr")
 SELF = os.path.realpath(__file__)
 DONE_P = os.path.join(STATE, "git_done.json")
+PEND_P = os.path.join(STATE, "pending_recs.json")
 LOG_P = os.path.join(STATE, "git_poller.log")
 CONF_P = os.path.join(STATE, "outbox.conf")
 LOCK_P = os.path.join(STATE, "git_poller.lock")
 MAX_INLINE = 60000
+CREDS_TTL = 1800
+PEND_MAX = 20
+FLUSH_PER_CYCLE = 5
 HOST = os.uname().nodename
 
 
 def log(m):
     s = "[%s][%s] %s" % (time.strftime("%F %T"), VER, m)
-    print(s, flush=True)
     try:
         os.makedirs(STATE, exist_ok=True)
         with open(LOG_P, "a") as f:
             f.write(s + "\n")
     except Exception:
         pass
+    if os.environ.get("BUS_LOG_ECHO") == "1":
+        print(s, flush=True)
 
 
 def sh(cmd, timeout=600, cwd=None, env=None):
@@ -112,11 +125,32 @@ def rentry_edit(slug, code, text):
     return ('"200"' in r or "200" in r[:60]), r[:160]
 
 
-def get_creds():
+def _conf_read():
+    d = {}
+    try:
+        for line in open(CONF_P):
+            if "=" in line:
+                k, v = line.strip().split("=", 1)
+                d[k] = v
+    except Exception:
+        pass
+    return d
+
+
+def get_creds(force=False):
+    """outbox 凭据：env > 30 分钟内缓存 > 指针页 > 陈旧缓存兜底。"""
     slug = os.environ.get("BUS_OUT_SLUG")
     code = os.environ.get("BUS_OUT_CODE")
     if slug and code:
         return slug, code
+    if not force and os.path.isfile(CONF_P):
+        try:
+            if time.time() - os.path.getmtime(CONF_P) < CREDS_TTL:
+                d = _conf_read()
+                if d.get("slug") and d.get("code"):
+                    return d["slug"], d["code"]
+        except Exception:
+            pass
     try:
         txt = textarea(PTR_SLUG)
         s2, c2 = field(txt, "outbox_slug"), field(txt, "outbox_code")
@@ -131,18 +165,30 @@ def get_creds():
             return s2, c2
     except Exception as e:
         log("pointer creds read failed: %s" % str(e)[:100])
-    if os.path.isfile(CONF_P):
-        d = {}
-        try:
-            for line in open(CONF_P):
-                if "=" in line:
-                    k, v = line.strip().split("=", 1)
-                    d[k] = v
-        except Exception:
-            pass
-        if d.get("slug") and d.get("code"):
-            return d["slug"], d["code"]
+    d = _conf_read()
+    if d.get("slug") and d.get("code"):
+        return d["slug"], d["code"]
     return None, None
+
+
+def load_json(p, default):
+    try:
+        with open(p, encoding="utf-8") as f:
+            v = json.load(f)
+        return v if isinstance(v, type(default)) else default
+    except Exception:
+        return default
+
+
+def save_json(p, v):
+    try:
+        os.makedirs(os.path.dirname(p), exist_ok=True)
+        tmp = p + ".tmp"
+        with open(tmp, "w", encoding="utf-8") as f:
+            json.dump(v, f, ensure_ascii=False)
+        os.replace(tmp, p)
+    except Exception as e:
+        log("state save failed %s: %s" % (os.path.basename(p), str(e)[:80]))
 
 
 def pull_repo():
@@ -178,7 +224,7 @@ def self_update():
             f.write(new)
         os.chmod(tmp, 0o755)
         os.replace(tmp, SELF)
-        log("SELF-UPDATE applied, re-exec")
+        log("SELF-UPDATE applied -> %s, re-exec" % VER)
         os.execv(sys.executable, [sys.executable, SELF] + sys.argv[1:])
     except Exception as e:
         log("SELF-UPDATE failed: %s" % str(e)[:120])
@@ -259,6 +305,24 @@ def write_outbox(slug, code, rec, tid):
     return ok
 
 
+def flush_pending(slug, code, done):
+    """把本地待发回执补投出去（每轮最多 FLUSH_PER_CYCLE 条，失败留队）。"""
+    pend = load_json(PEND_P, {})
+    if not pend:
+        return 0
+    sent = 0
+    for tid in list(pend.keys())[:FLUSH_PER_CYCLE]:
+        if write_outbox(slug, code, pend[tid], tid):
+            del pend[tid]
+            sent += 1
+            if tid in done:
+                done[tid]["receipt"] = "delivered"
+    save_json(PEND_P, pend)
+    if sent:
+        log("pending receipts flushed: %d (left=%d)" % (sent, len(pend)))
+    return sent
+
+
 def main():
     os.makedirs(STATE, exist_ok=True)
 
@@ -279,15 +343,14 @@ def main():
         log("lock held, skip")
         return 0
 
+    done = load_json(DONE_P, {})
+    slug, code = get_creds()
+    if slug and code:
+        flush_pending(slug, code, done)
+
     # 4) 扫描任务
-    done = {}
-    try:
-        with open(DONE_P, encoding="utf-8") as f:
-            done = json.load(f)
-    except Exception:
-        done = {}
     tdir = os.path.join(REPODIR, "tasks")
-    claimed = 0
+    executed = 0
     if os.path.isdir(tdir):
         for tid in sorted(os.listdir(tdir)):
             td = os.path.join(tdir, tid)
@@ -301,7 +364,7 @@ def main():
                 log("task.json bad in %s: %s" % (tid, str(e)[:80]))
                 continue
             t.setdefault("id", tid)
-            if done.get(t["id"], {}).get("exit") is not None:
+            if t["id"] in done:
                 continue
             target = t.get("target", "any")
             if target not in ("any", ROLE):
@@ -318,21 +381,22 @@ def main():
             rc, arts = run_task(t)
             rec = build_rec(t["id"], t.get("nonce", ""), t.get("type", "script"), rc, arts,
                             note=t.get("note", ""))
-            slug, code = get_creds()
-            if slug and code:
-                if write_outbox(slug, code, rec, t["id"]):
-                    done[t["id"]] = {"exit": rc, "ts": time.strftime("%FT%T")}
-                    claimed += 1
+            now = time.strftime("%FT%T")
+            if slug and code and write_outbox(slug, code, rec, t["id"]):
+                done[t["id"]] = {"exit": rc, "ts": now, "receipt": "delivered"}
             else:
-                log("no outbox creds; cannot report %s" % t["id"])
+                pend = load_json(PEND_P, {})
+                if len(pend) < PEND_MAX:
+                    pend[t["id"]] = rec
+                    save_json(PEND_P, pend)
+                done[t["id"]] = {"exit": rc, "ts": now, "receipt": "pending"}
+                log("receipt queued locally for %s (will flush when outbox returns)" % t["id"])
+            executed += 1
             break  # 一轮只做一个，避免超时叠加
-    try:
-        with open(DONE_P, "w", encoding="utf-8") as f:
-            json.dump(done, f, ensure_ascii=False)
-    except Exception:
-        pass
-    if not claimed:
-        log("no new tasks for role=%s" % ROLE)
+
+    save_json(DONE_P, done)
+    if not executed:
+        log("no new tasks for role=%s (pending=%d)" % (ROLE, len(load_json(PEND_P, {}))))
     return 0
 
 
