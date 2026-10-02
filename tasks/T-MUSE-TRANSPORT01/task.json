@@ -5,6 +5,7 @@
   "nonce": "NONCE-MUSE-TRANSPORT01-20261002",
   "timeout": 1800,
   "created": "2026-10-02T08:06:07Z",
-  "note": "Repair tolerant rentry receipt retransmission; do not repeat completed coding",
+  "expires": "2026-10-02T09:00:00Z",
+  "note": "SUPERSEDED by T-MUSE-LIVENESS01 (2026-10-02): tolerant rentry transport delivered via hb_publish.py/rec_write.py; AGENT01/AGENT02 receipts arrived and were HK-verified; goal met, do not re-run. Expired out of the pending ledger so it stops showing as permanently overdue.",
   "files": {"prompt.md": "f46a8b5068a36080f5c42d90116cad5e8f09474fe41f701e2f78b20ca0a4c37f"}
 }
