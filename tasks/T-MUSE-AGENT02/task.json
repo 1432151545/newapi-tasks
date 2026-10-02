@@ -1,0 +1,10 @@
+{
+  "id": "T-MUSE-AGENT02",
+  "type": "agent",
+  "target": "muse",
+  "nonce": "NONCE-MUSE-AGENT02-20261002",
+  "timeout": 1800,
+  "created": "2026-10-02T07:52:11Z",
+  "note": "SG independent verification found invalid dates accepted; native Agent revision",
+  "files": {"prompt.md": "0908cf71dc67ffad84e327111ed928904cc97edab879dc32eb4293fcb83dc1cf"}
+}
