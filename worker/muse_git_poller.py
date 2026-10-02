@@ -42,7 +42,7 @@ import time
 import urllib.parse
 import urllib.request
 
-VER = "gitpoller-8"
+VER = "gitpoller-9"
 UA = "Mozilla/5.0 (X11; Linux x86_64)"
 ROLE = os.environ.get("BUS_ROLE", "muse")
 REPO = os.environ.get("BUS_REPO", "https://github.com/1432151545/newapi-tasks.git")
@@ -296,6 +296,33 @@ def self_update():
         log("SELF-UPDATE failed: %s" % str(e)[:120])
 
 
+def get_exec_template():
+    """agent 任务执行器命令模板：env BUS_EXEC > repo worker/bus_exec > 空。
+
+    repo 文件格式（{prompt_file}/{task_id} 由 run_task 替换）：
+        default=<cmd>     # 所有角色共用
+        <role>=<cmd>      # 覆盖本角色，例如：muse=/opt/hatch-image/bin/codex ...
+    注意：该文件在公开任务库内，**不得写入任何凭据**。
+    """
+    t = os.environ.get("BUS_EXEC", "")
+    if t:
+        return t
+    p = os.path.join(REPODIR, "worker", "bus_exec")
+    try:
+        if os.path.isfile(p):
+            d = {}
+            for line in open(p, encoding="utf-8"):
+                line = line.strip()
+                if not line or line.startswith("#") or "=" not in line:
+                    continue
+                k, v = line.split("=", 1)
+                d[k.strip()] = v.strip()
+            return d.get(ROLE) or d.get("default") or ""
+    except Exception as e:
+        log("bus_exec read failed: %s" % str(e)[:80])
+    return ""
+
+
 def run_task(t):
     td = os.path.join(REPODIR, "tasks", t["id"])
     files = t.get("files") or {}
@@ -326,12 +353,12 @@ def run_task(t):
                 f.write(prompt)
         except Exception:
             pass
-        tmpl = os.environ.get("BUS_EXEC", "")
+        tmpl = get_exec_template()
         if not tmpl:
-            return 0, {"agent.log": ("prompt queued: %s (BUS_EXEC not configured, no executor run)" % pfq).encode()}
+            return 0, {"agent.log": ("prompt queued: %s (no executor configured, no executor run)" % pfq).encode()}
         cmd = tmpl.replace("{prompt_file}", pfq).replace("{task_id}", t["id"])
         rc, o = sh(cmd, int(t.get("timeout", 1800)))
-        return rc, {"agent.log": o.encode()}
+        return rc, {"agent.log": ("EXEC: %s\n%s" % (cmd, o)).encode()}
     return 1, {"error.txt": ("unknown type %s" % ttype).encode()}
 
 
