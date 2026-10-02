@@ -42,7 +42,7 @@ import time
 import urllib.parse
 import urllib.request
 
-VER = "gitpoller-6"
+VER = "gitpoller-7"
 UA = "Mozilla/5.0 (X11; Linux x86_64)"
 ROLE = os.environ.get("BUS_ROLE", "muse")
 REPO = os.environ.get("BUS_REPO", "https://github.com/1432151545/newapi-tasks.git")
@@ -103,11 +103,56 @@ def fetch(url, timeout=60):
     return urllib.request.urlopen(req, timeout=timeout).read().decode("utf-8", "replace")
 
 
+def _read_tolerant(resp, limit=4_000_000):
+    """读响应体，**容忍中途被掐断**；返回 (文本, 是否完整读完)。
+
+    沙箱出口代理对响应体积有上限（实测 rentry /edit 页读到 ~23174B 即断），
+    但 csrf token 位于页面第 3062 字节 —— 拿到部分内容就足够发起 POST。
+    关键：必须用同一个 opener 读，cookie 才会进 jar（POST 校验要用）。
+    """
+    buf = bytearray()
+    complete = False
+    try:
+        while len(buf) < limit:
+            chunk = resp.read(8192)
+            if not chunk:
+                complete = True
+                break
+            buf += chunk
+    except Exception as e:
+        log("read cut after %d bytes: %s" % (len(buf), str(e)[:70]))
+    return buf.decode("utf-8", "replace"), complete
+
+
+def fetch_partial(url, timeout=35, limit=4_000_000):
+    """GET 并容错读取；返回 (文本, 是否完整)。"""
+    try:
+        resp = urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": UA}),
+                                      timeout=timeout)
+        return _read_tolerant(resp, limit)
+    except Exception as e:
+        log("open failed: %s" % str(e)[:70])
+        return "", False
+
+
+def textarea_full(slug):
+    """取 /edit 页 <textarea>，返回 (内容, 是否完整读完)。"""
+    h, complete = fetch_partial("https://rentry.co/%s/edit" % slug)
+    m = re.search(r"<textarea[^>]*>(.*?)</textarea>", h, re.S)
+    if m:
+        return _h.unescape(m.group(1)), complete
+    # textarea 在截断点未闭合 → 退化为「取 textarea 起始之后的余下内容」
+    i = h.find("<textarea")
+    if i >= 0:
+        body = h[i:]
+        body = body[body.find(">") + 1:]
+        return _h.unescape(body), complete
+    return "", complete
+
+
 def textarea(slug):
     """取 rentry /edit 页 <textarea>（存储原文，零渲染污染）。"""
-    h = fetch("https://rentry.co/%s/edit" % slug)
-    m = re.search(r"<textarea[^>]*>(.*?)</textarea>", h, re.S)
-    return _h.unescape(m.group(1)) if m else ""
+    return textarea_full(slug)[0]
 
 
 def field(txt, name, pat=r"(\S+)"):
@@ -116,18 +161,25 @@ def field(txt, name, pat=r"(\S+)"):
 
 
 def rentry_edit(slug, code, text):
-    """与 HK 侧 worker 同款：GET /edit 取 csrf → POST /api/edit/<slug>。"""
+    """与 HK 侧 worker 同款：GET /edit 取 csrf → POST /api/edit/<slug>。
+
+    读取走 fetch_partial：沙箱出口代理会在 ~23KB 处掐断响应，但 csrf token
+    在页面靠前位置，拿到部分内容即可提交（POST 体积本身很小）。
+    """
     cj = http.cookiejar.CookieJar()
     op = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(cj))
     op.addheaders = [("User-Agent", UA)]
     eurl = "https://rentry.co/%s/edit" % slug
+    html = ""
     try:
-        html = op.open(eurl, timeout=35).read().decode("utf-8", "replace")
+        # 同一个 opener 读 → cookie 进 jar（POST 校验要）；读被掐断也保留已读部分
+        html, _c = _read_tolerant(op.open(eurl, timeout=35))
     except Exception as e:
-        return False, "GET edit: %s" % e
+        log("csrf GET failed: %s" % str(e)[:70])
+        html, _c = fetch_partial(eurl, timeout=35)
     m = re.search(r'name="csrfmiddlewaretoken" value="([^"]+)"', html)
     if not m:
-        return False, "no csrf token"
+        return False, "no csrf token (read %d bytes)" % len(html)
     data = urllib.parse.urlencode({"csrfmiddlewaretoken": m.group(1), "text": text,
                                    "edit_code": code}).encode()
     req = urllib.request.Request("https://rentry.co/api/edit/%s" % slug, data=data,
@@ -363,15 +415,26 @@ def ntfy_post(topic, text):
         return False, "ntfy POST: %s" % str(e)[:90]
 
 
+def parse_recs_tolerant(text):
+    """从（可能被截断的）outbox 文本里尽力提取 REC/HB 行。"""
+    out = [l.strip() for l in text.splitlines() if l.strip().startswith(("HB|", "REC|"))]
+    return out
+
+
 def write_outbox(slug, code, rec, tid):
+    """写入回执：先尽力拉旧内容做合并；拉不全就**直接写**（新 REC 排最后仍可读）。"""
+    remote = []
+    complete = False
     try:
-        remote = [l.strip() for l in textarea(slug).splitlines()
-                  if l.strip().startswith(("HB|", "REC|"))]
+        txt, complete = textarea_full(slug)
+        remote = parse_recs_tolerant(txt)
     except Exception as e:
         log("outbox read failed (write without merge): %s" % str(e)[:80])
-        remote = []
+    if not complete and remote:
+        log("outbox read truncated (%d recs seen); merge may drop newest" % len(remote))
     remote = [l for l in remote if not l.startswith("REC|task=%s|" % tid)]
-    recs = ([l for l in remote if l.startswith("REC|")] + [rec])[-10:]
+    # 新 REC 放**最前**：页面被截断时先切掉的是最旧的，最新回执始终可读
+    recs = ([rec] + [l for l in remote if l.startswith("REC|")])[:10]
     hbs = [l for l in remote if l.startswith("HB|")][-3:]
     text = "HERMES MUSE OUTBOX\n" + "\n".join(hbs + recs).strip() + "\n"
     ok, r = rentry_edit(slug, code, text)
