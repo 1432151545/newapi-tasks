@@ -1,0 +1,79 @@
+{
+  "task_id": "T-MUSE-LIVENESS01",
+  "nonce": "NONCE-MUSE-LIVENESS01-20261002",
+  "verified_by": "hermes-hk",
+  "verified_at_utc": "2026-10-02T09:10:44Z",
+  "task_class": "ops (heartbeat/receipt-resume config) — receipt+evidence verification, NOT a code deliverable",
+  "transport_sha_verified": true,
+  "rec_overall_sha256": "8487f440a8abcd2e113bd04d6ef4201e6aa6e0371a05b7d058fe3450f1e95b14",
+  "nonce_match": true,
+  "exit": 0,
+  "status_reported": "executed",
+  "rec_ts": "2026-10-02T08:51:16Z",
+  "artifacts": {
+    "shape": "list(path, sha256) — no inline bytes, no size",
+    "items": [
+      {
+        "path_basename": "hb_publish.py",
+        "sha256_prefix": "d6736ec6b1d299b5"
+      },
+      {
+        "path_basename": "rec_write.py",
+        "sha256_prefix": "637b387804a197a9"
+      },
+      {
+        "path_basename": "hb_rule.md",
+        "sha256_prefix": "d66650a9e3abecec"
+      },
+      {
+        "path_basename": "hb_state.json",
+        "sha256_prefix": "64b6141f9fa0fd68"
+      }
+    ],
+    "bytes_recomputed": false,
+    "reason": "REC carries path+sha256 only (no b64 payload) — sandbox-internal files are not independently fetchable (no inbound path); no byte/size recomputation possible",
+    "path_traversal": "none (all paths relative, no '..')"
+  },
+  "heartbeat_evidence": {
+    "claimed_first_hb_ts": "2026-10-02T08:50:33Z",
+    "claimed_first_hb_selfsha_valid": true,
+    "live_hb_ts_on_page": "2026-10-02T09:08:56Z",
+    "live_hb_selfsha_valid": true,
+    "live_hb_role": "muse-native-agent",
+    "hb_fresh_seconds": 108,
+    "hb_advancing": true,
+    "note": "page keeps only newest HB per role, so the REC's claimed first HB is superseded by a newer, independently self-sha-verified HB → heartbeat mechanism is live"
+  },
+  "config_evidence": {
+    "reported_changes": [
+      "未修改 cron 计划本体 hermes-agent-executor（本轮执行契约禁止擅自改 schedule；计划仍每 5 分钟一轮）。",
+      "新增 ~/.hermes-gitbus/hb_rule.md：executor 心跳规则（空闲轮每 15 分钟经 rentry outbox 发布 HB；任务轮完成后顺带 HB；恢复轮先补发完整产物再续做；executed_transport_pending 不重复编码）。",
+      "新增 ~/workspace/agent-work/T-MUSE-LIVENESS01/hb_publish.py：容错 rentry 写 HB（只保留每 role 最新一条 HB；全部 sha 校验通过的完整 REC 保留；读不到完整 <textarea> 时拒绝写入不覆盖；POST 后容错重读验证）。",
+      "新增 ~/.hermes-gitbus/hb_state.json：{last_hb_ts, last_hb_line, role, host}，空闲轮据此做 15 分钟节流。",
+      "新增 ~/workspace/agent-work/T-MUSE-LIVENESS01/rec_write.py：本任务 REC 的容错回传（同传输契约）。"
+    ],
+    "reported_limits": [
+      "不能确认 runtime 会唤醒休眠中的沙箱；沙箱可能因调度退避长时间未运行，HB 间隔可能因此超过 15 分钟——如实状态，不宣称永不休眠。",
+      "rentry / 出口代理故障时 HB 可能失败：记日志、不伪造成功，下轮（5 分钟）重试。",
+      "沙箱 SSH 出网被出口代理阻断，newapi-receipts 仓库 git 推送不可用；本任务回执以 rentry outbox 页为实际通道（容错读写+重读验证）。",
+      "心跳仅表示 agent 实际成功运行并成功回传，不使用 cron 计划时间充当心跳。"
+    ],
+    "not_done": [
+      "未修改 new-api / watchdog / 生产服务",
+      "未新建调度器",
+      "未启动外部 Agent（无 Codex）",
+      "未人为休眠/停止沙箱",
+      "未泄露凭据（edit_code 仅存本地 outbox.conf，未写入任何回执）"
+    ],
+    "constraint_compliance": {
+      "did_not_touch_newapi_watchdog_production": true,
+      "no_new_scheduler": true,
+      "no_external_agent": true,
+      "no_credential_leak_in_receipt": true,
+      "does_not_claim_never_sleeps": true
+    }
+  },
+  "verdict": "accepted",
+  "verdict_scope": "receipt integrity + heartbeat/evidence consistency verified; sandbox-internal file contents not independently inspectable (documented limitation)",
+  "followup_task": null
+}

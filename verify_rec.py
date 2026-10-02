@@ -135,8 +135,12 @@ def main():
             i["task"], i["src"], i["exit"], i["ts"], i["host"], i["nonce"]))
         print("  sha_ok = %s%s" % (i["sha_ok"], "" if i["sha_ok"] else "  <-- 不一致! " + i.get("err", "")))
         p = i.get("payload") or {}
-        for name, a in (p.get("artifacts") or {}).items():
-            print("  artifact %-14s size=%-7s sha=%s" % (name, a.get("size"), (a.get("sha256") or "")[:16]))
+        arts = p.get("artifacts") or {}
+        items = arts.items() if isinstance(arts, dict) else ((a.get("path") or "?", a) for a in arts)
+        for name, a in items:
+            a = a or {}
+            print("  artifact %-14s size=%-7s sha=%s" % (
+                (name or "?").split("/")[-1], a.get("size", "-"), (a.get("sha256") or "")[:16]))
         note = p.get("note")
         if note:
             print("  note: %s" % str(note)[:110])
