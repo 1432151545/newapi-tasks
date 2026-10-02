@@ -1,0 +1,39 @@
+{
+  "task": "T-MUSE-AGENT02",
+  "sha_ok": true,
+  "verified_at": "2026-10-02T08:39:18Z",
+  "rec_overall_sha256": "478cd8038e3fb747cd4f7d564090e9f161cd1f0848b22fe670daf6cdf168d3be",
+  "rec_length": 29712,
+  "nonce": "NONCE-MUSE-AGENT02-20261002",
+  "nonce_match": true,
+  "exit": 0,
+  "ts": "2026-10-02T07:55:50Z",
+  "host": "htch-runtime",
+  "status": "executed_transport_pending",
+  "files": {
+    "task_guard.py": {"sha256": "c23bf157f5e3a8ebca354e375807744613b3dfd68e31f46dd4b48d7f29415ca8", "bytes": 3616, "match": true},
+    "test_task_guard.py": {"sha256": "038666c7511889a129508a07ea9aca82c17553d517bd8d5e231f575d31b76a14", "bytes": 8334, "match": true},
+    "test_run.log": {"sha256": "1f9424c759d8c7d21ce6edb97b89c36263278c12579ae374537465066455f4d6", "bytes": 2563, "match": true},
+    "manifest.json": {"sha256": "5aeee1595e6a5ad274dd9f63caf2c86f363e264539e3013676a8ba9a2207201d", "bytes": 1083, "match": true}
+  },
+  "sg_verification": {
+    "host": "qwenpaw-sbs-prod-data-qw9zg",
+    "python": "3.11.2",
+    "remote_sha_match": true,
+    "muse_suite": {"command": "python3 -m unittest -v test_task_guard", "run": 25, "passed": 25, "exit": 0},
+    "hk_independent": {"script_sha256": "0cce6c586b552b14cb502a48422980cdcf07c23a89210c3cd8b69526337beb8e", "exit": 0, "result": "PASS",
+      "covered": ["created=2026-02-30 rejected", "created=2025-02-29 rejected", "created=2026-04-31 rejected",
+                  "trailing \\n and \\r\\n rejected (created/enablement/now/expires)",
+                  "expires present-but-None rejected", "expires missing accepted",
+                  "created=2024-02-29 accepted (leap year)"]}
+  },
+  "source_review": {"dangerous_behavior_found": false, "notes": "stdlib only (re, datetime); pure predicate; no subprocess/exec/eval/os/socket/file I/O"},
+  "verdict": "accepted",
+  "followup_task": null,
+  "archive": {
+    "private_repo": "1432151545/newapi-receipts",
+    "receipts": ["receipts/T-MUSE-AGENT02.json", "receipts/T-MUSE-AGENT02.rec"],
+    "verification": "verification/T-MUSE-AGENT02.json"
+  },
+  "note": "Muse native agent revision fixed the invalid-calendar-date acceptance found by SG on T-MUSE-AGENT01; HK independent SG verification passes; no further follow-up required."
+}

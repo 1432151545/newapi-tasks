@@ -1,0 +1,54 @@
+{
+  "task_id": "T-MUSE-AGENT02",
+  "nonce": "NONCE-MUSE-AGENT02-20261002",
+  "verified_by": "hermes-hk",
+  "verified_at_utc": "2026-10-02T08:39:18Z",
+  "transport_sha_verified": true,
+  "rec_overall_sha256": "478cd8038e3fb747cd4f7d564090e9f161cd1f0848b22fe670daf6cdf168d3be",
+  "nonce_match": true,
+  "files_sha_verified": true,
+  "files": {
+    "task_guard.py": {"sha256": "c23bf157f5e3a8ebca354e375807744613b3dfd68e31f46dd4b48d7f29415ca8", "bytes": 3616, "match": true},
+    "test_task_guard.py": {"sha256": "038666c7511889a129508a07ea9aca82c17553d517bd8d5e231f575d31b76a14", "bytes": 8334, "match": true},
+    "test_run.log": {"sha256": "1f9424c759d8c7d21ce6edb97b89c36263278c12579ae374537465066455f4d6", "bytes": 2563, "match": true},
+    "manifest.json": {"sha256": "5aeee1595e6a5ad274dd9f63caf2c86f363e264539e3013676a8ba9a2207201d", "bytes": 1083, "match": true}
+  },
+  "source_review": {
+    "dangerous_behavior_found": false,
+    "notes": "stdlib only (re, datetime). No subprocess/exec/eval/os/socket/file/network I/O. Pure predicate over caller-supplied values. Not wired into any scheduler."
+  },
+  "sg_host": "qwenpaw-sbs-prod-data-qw9zg",
+  "sg_python": "3.11.2",
+  "sg_remote_sha_match": true,
+  "muse_self_reported": {"tests_run": 25, "tests_failed": 0, "exit": 0},
+  "original_tests": {
+    "run": 25,
+    "passed": 25,
+    "exit": 0,
+    "command": "python3 -m unittest -v test_task_guard"
+  },
+  "independent_check": {
+    "authorship": "hermes-hk (not Muse)",
+    "script_sha256": "0cce6c586b552b14cb502a48422980cdcf07c23a89210c3cd8b69526337beb8e",
+    "exit": 0,
+    "cases": [
+      {"case": "eligible(created=2026-02-30T12:00:00Z)", "expected": false, "actual": false, "ok": true},
+      {"case": "created=2026-02-30T00:00:00Z", "expected": false, "actual": false, "ok": true},
+      {"case": "created=2025-02-29T00:00:00Z", "expected": false, "actual": false, "ok": true},
+      {"case": "created=2026-04-31T00:00:00Z", "expected": false, "actual": false, "ok": true},
+      {"case": "created trailing \\n", "expected": false, "actual": false, "ok": true},
+      {"case": "created trailing \\r\\n", "expected": false, "actual": false, "ok": true},
+      {"case": "enablement trailing \\n", "expected": false, "actual": false, "ok": true},
+      {"case": "now trailing \\n", "expected": false, "actual": false, "ok": true},
+      {"case": "expires present but None", "expected": false, "actual": false, "ok": true},
+      {"case": "expires missing", "expected": true, "actual": true, "ok": true},
+      {"case": "expires=2026-02-30T00:00:00Z", "expected": false, "actual": false, "ok": true},
+      {"case": "expires=2025-02-29T00:00:00Z", "expected": false, "actual": false, "ok": true},
+      {"case": "created=2024-02-29T12:00:00Z (leap, legal)", "expected": true, "actual": true, "ok": true},
+      {"case": "_valid_utc_iso(2024-02-29T00:00:00Z)", "expected": true, "actual": true, "ok": true}
+    ],
+    "result": "PASS"
+  },
+  "verdict": "accepted",
+  "followup_task": null
+}

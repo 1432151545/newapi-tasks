@@ -1,0 +1,14 @@
+0cce6c586b552b14cb502a48422980cdcf07c23a89210c3cd8b69526337beb8e  sg_independent_test02.py
+c23bf157f5e3a8ebca354e375807744613b3dfd68e31f46dd4b48d7f29415ca8  task_guard.py
+038666c7511889a129508a07ea9aca82c17553d517bd8d5e231f575d31b76a14  test_task_guard.py
+0cce6c586b552b14cb502a48422980cdcf07c23a89210c3cd8b69526337beb8e  sg_independent_test02.py
+c23bf157f5e3a8ebca354e375807744613b3dfd68e31f46dd4b48d7f29415ca8  task_guard.py
+038666c7511889a129508a07ea9aca82c17553d517bd8d5e231f575d31b76a14  test_task_guard.py
+---FILES---
+total 32
+drwx------ 3 agentscope agentscope 4096 Oct  2 08:36 .
+drwx------ 4 agentscope agentscope 4096 Oct  2 08:34 ..
+drwx------ 2 agentscope agentscope 4096 Oct  2 08:36 __pycache__
+-rw------- 1 agentscope agentscope 3232 Oct  2 08:35 sg_independent_test02.py
+-rw------- 1 agentscope agentscope 3616 Oct  2 08:34 task_guard.py
+-rw------- 1 agentscope agentscope 8334 Oct  2 08:34 test_task_guard.py
