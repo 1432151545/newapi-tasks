@@ -42,7 +42,7 @@ import time
 import urllib.parse
 import urllib.request
 
-VER = "gitpoller-9"
+VER = "gitpoller-10"
 UA = "Mozilla/5.0 (X11; Linux x86_64)"
 ROLE = os.environ.get("BUS_ROLE", "muse")
 REPO = os.environ.get("BUS_REPO", "https://github.com/1432151545/newapi-tasks.git")
@@ -83,14 +83,44 @@ def log(m):
         print(s, flush=True)
 
 
-def sh(cmd, timeout=600, cwd=None, env=None):
+def _kill_tree(p):
+    """杀掉整个进程组（含孙进程）。失败退回单进程 kill。"""
+    import signal
     try:
-        p = subprocess.run(cmd, shell=isinstance(cmd, str), capture_output=True,
-                           text=True, timeout=timeout, cwd=cwd, env=env)
-        return p.returncode, (p.stdout or "") + (p.stderr or "")
-    except subprocess.TimeoutExpired:
-        return 124, "TIMEOUT after %ss" % timeout
+        os.killpg(os.getpgid(p.pid), signal.SIGKILL)
+    except Exception:
+        try:
+            p.kill()
+        except Exception:
+            pass
+
+
+def sh(cmd, timeout=600, cwd=None, env=None):
+    """执行命令，返回 (rc, 输出)。
+
+    ⚠️ 必须用**独立进程组** + 超时后**杀整组**：agent 执行器（codex 等）会派生
+    子/孙进程；只杀直接子进程时，孙进程继续持有 stdout 管道 → 读端永久阻塞
+    → **整个 poller 循环卡死**（2026-10-02 T-MSP04 实测踩到，循环停了 >25 分钟，
+    连心跳任务都领不了）。铁律：任何外部执行器调用都要能连根拔起。
+    """
+    p = None
+    try:
+        p = subprocess.Popen(cmd, shell=isinstance(cmd, str), cwd=cwd, env=env,
+                             stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                             text=True, start_new_session=True)
+        try:
+            out, _ = p.communicate(timeout=timeout)
+            return p.returncode, out or ""
+        except subprocess.TimeoutExpired:
+            _kill_tree(p)
+            try:
+                out, _ = p.communicate(timeout=20)
+            except Exception:
+                out = ""
+            return 124, ("TIMEOUT after %ss (process-group killed)\n" % timeout) + (out or "")
     except Exception as e:
+        if p is not None:
+            _kill_tree(p)
         return 1, "EXEC_ERR %s" % e
 
 
@@ -357,7 +387,8 @@ def run_task(t):
         if not tmpl:
             return 0, {"agent.log": ("prompt queued: %s (no executor configured, no executor run)" % pfq).encode()}
         cmd = tmpl.replace("{prompt_file}", pfq).replace("{task_id}", t["id"])
-        rc, o = sh(cmd, int(t.get("timeout", 1800)))
+        cap = int(os.environ.get("BUS_AGENT_MAX", "600"))
+        rc, o = sh(cmd, min(int(t.get("timeout", 1800)), cap))
         return rc, {"agent.log": ("EXEC: %s\n%s" % (cmd, o)).encode()}
     return 1, {"error.txt": ("unknown type %s" % ttype).encode()}
 
