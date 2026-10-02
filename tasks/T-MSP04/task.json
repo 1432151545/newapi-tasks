@@ -6,5 +6,8 @@
   "timeout": 700,
   "created": "2026-10-02T05:42:00Z",
   "note": "decisive: can codex actually reach a model (auth + non-interactive exec)",
-  "files": {"script.sh": "2ca5b42df7e87f067de23f82170df89757e71256f8a6d90172e5048c29048bd4"}
+  "files": {
+    "script.sh": "2ca5b42df7e87f067de23f82170df89757e71256f8a6d90172e5048c29048bd4"
+  },
+  "expires": "2026-10-02T06:55:00Z"
 }

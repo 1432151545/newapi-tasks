@@ -6,5 +6,8 @@
   "timeout": 120,
   "created": "2026-10-02T05:58:40Z",
   "note": "heartbeat: is the muse poller loop alive? is a codex run still in flight?",
-  "files": {"script.sh": "9178a2776e9101d62b4b37aa7b10452678eb659f5b57170d30d511c5cdaa5de5"}
+  "files": {
+    "script.sh": "9178a2776e9101d62b4b37aa7b10452678eb659f5b57170d30d511c5cdaa5de5"
+  },
+  "expires": "2026-10-02T06:55:00Z"
 }
