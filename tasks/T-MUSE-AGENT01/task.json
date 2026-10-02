@@ -1,0 +1,10 @@
+{
+  "id": "T-MUSE-AGENT01",
+  "type": "agent",
+  "target": "muse",
+  "nonce": "NONCE-MUSE-AGENT01-20261002",
+  "timeout": 1800,
+  "created": "2026-10-02T07:41:31Z",
+  "note": "Native Muse agent writes task eligibility guard and returns real code for SG verification",
+  "files": {"prompt.md": "054440e0cd33d6de9549ddcab51d45794c9844cb4e2a7e6a18c4ccb15c5ec6cd"}
+}
