@@ -1,0 +1,17 @@
+{
+ "task_id": "T-GITR01",
+ "nonce": "NONCE-GIT-RECEIPT-001",
+ "type": "script",
+ "exit": 0,
+ "ts": "2026-10-02T04:31:32",
+ "worker": "sg",
+ "host": "qwenpaw-sbs-prod-data-qw9zg",
+ "artifacts": {
+  "script.log": {
+   "sha256": "342f45a0ff48cabcf472868bd0570e07461d7845547a413bd0da9c09ea3b3400",
+   "size": 203,
+   "b64": "UkVDRUlQVC1WSUEtR0lUIEUyRQpob3N0PXF3ZW5wYXctc2JzLXByb2QtZGF0YS1xdzl6Zwp1c2VyPWFnZW50c2NvcGUKZGF0ZT0yMDI2LTEwLTAyVDA0OjMxOjMxWgpnaXRfdmVyc2lvbj1naXQgdmVyc2lvbiAyLjM5LjUKcG9sbGVyX3JvbGU9c2cKbm9uY2U9Tk9OQ0UtR0lULVJFQ0VJUFQtMDAxCnJlY2VpcHRzX3JlcG9fbGl2ZV9wcm9iZT1odHRwXzQwNAo="
+  }
+ },
+ "note": "verify receipt-return-via-git channel (deploy key)"
+}
