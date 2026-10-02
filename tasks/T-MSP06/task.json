@@ -1,0 +1,10 @@
+{
+  "id": "T-MSP06",
+  "type": "script",
+  "target": "muse",
+  "nonce": "NONCE-MSP06-001",
+  "timeout": 240,
+  "created": "2026-10-02T07:08:05Z",
+  "note": "post-unblock heartbeat: did the muse poller loop resume after codex kill?",
+  "files": {"script.sh": "ecd1a9162a8266796466fafd536fca29135935a0c1e954131d3148d0983fb088"}
+}
