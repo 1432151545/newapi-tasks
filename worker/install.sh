@@ -27,7 +27,7 @@ print("syntax OK")
 PYEOF
 
 echo "== 3) schedule =="
-POLL_LINE='python3 "$B/muse_git_poller.py" >> "$B/git_poller.log" 2>&1 || true'
+POLL_LINE="python3 \"$HOME/.hermes-gitbus/muse_git_poller.py\" >> \"$HOME/.hermes-gitbus/git_poller.log\" 2>&1 || true"
 if [ -f "$WATCHDOG" ] && grep -q 'sync_patch_from_pointer' "$WATCHDOG"; then
   # watchdog 存在：在 sync 调用行后插入 poller 调用（幂等）
   if grep -q 'muse_git_poller.py' "$WATCHDOG"; then
