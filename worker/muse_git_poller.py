@@ -13,6 +13,9 @@
   · 日志只写 git_poller.log，不再 print —— 调用方的 `>> 同一文件` 会造成双份，
     "并发认领"是假信号（flock 一直正常）。
   · 回执先入本地队列再投递：rentry 抖动时任务只执行一次，恢复后自动补发。
+  · 回执通道 ntfy 优先、rentry 回落（2026-10-02）：rentry 前置 Cloudflare，共享代理
+    出口 IP 会被挑战/限流（实测沙箱侧 half-hour 不通）；ntfy.sh 是裸 nginx、
+    append-only、支持增量读，跨网络实测可用。topic 由指针页 receipt_topic 下发。
   · outbox 凭据带 30 分钟 TTL 缓存：不再每 60s 读一次指针页（省 rentry 配额）。
   · 不使用 systemd；调度由外部「单一 60s 循环」负责，本脚本不管调度。
 
@@ -37,7 +40,7 @@ import time
 import urllib.parse
 import urllib.request
 
-VER = "gitpoller-2"
+VER = "gitpoller-3"
 UA = "Mozilla/5.0 (X11; Linux x86_64)"
 ROLE = os.environ.get("BUS_ROLE", "muse")
 REPO = os.environ.get("BUS_REPO", "https://github.com/1432151545/newapi-tasks.git")
@@ -55,6 +58,8 @@ CREDS_TTL = 1800
 PEND_MAX = 20
 FLUSH_PER_CYCLE = 5
 HOST = os.uname().nodename
+NTFY_BASE = os.environ.get("BUS_NTFY_BASE", "https://ntfy.sh")
+NTFY_TOPIC = os.environ.get("BUS_NTFY_TOPIC", "")
 
 
 def log(m):
@@ -289,6 +294,44 @@ def build_rec(tid, nonce, ttype, rc, artifacts, note=""):
         base64.urlsafe_b64encode(rj).decode().rstrip("="))
 
 
+def get_topic():
+    """回执邮箱 topic：env > 本地缓存 > 指针页 receipt_topic。"""
+    if NTFY_TOPIC:
+        return NTFY_TOPIC
+    try:
+        d = _conf_read()
+        if d.get("topic"):
+            return d["topic"]
+    except Exception:
+        pass
+    try:
+        txt = textarea(PTR_SLUG)
+        t2 = field(txt, "receipt_topic")
+        if t2:
+            try:
+                with open(CONF_P, "a") as f:
+                    f.write("topic=%s\n" % t2)
+            except Exception:
+                pass
+            return t2
+    except Exception as e:
+        log("pointer topic read failed: %s" % str(e)[:100])
+    return ""
+
+
+def ntfy_post(topic, text):
+    """append-only 邮箱；无 Cloudflare，沙箱出口友好。"""
+    data = text.encode()
+    req = urllib.request.Request(NTFY_BASE.rstrip("/") + "/" + topic, data=data,
+                                 headers={"User-Agent": UA, "Title": "REC",
+                                          "Tags": "inbox_tray"})
+    try:
+        r = urllib.request.urlopen(req, timeout=25)
+        return r.status in (200, 201), "http %s" % getattr(r, "status", "?")
+    except Exception as e:
+        return False, "ntfy POST: %s" % str(e)[:90]
+
+
 def write_outbox(slug, code, rec, tid):
     try:
         remote = [l.strip() for l in textarea(slug).splitlines()
@@ -305,14 +348,26 @@ def write_outbox(slug, code, rec, tid):
     return ok
 
 
-def flush_pending(slug, code, done):
+def deliver(rec, tid, slug, code, topic):
+    """回执投递：ntfy 优先（append-only、无 Cloudflare），失败回落 rentry outbox。"""
+    if topic:
+        ok, r = ntfy_post(topic, rec)
+        log("deliver %s via ntfy: %s" % (tid, "OK" if ok else "FAIL " + str(r)[:70]))
+        if ok:
+            return True
+    if slug and code:
+        return write_outbox(slug, code, rec, tid)
+    return False
+
+
+def flush_pending(slug, code, topic, done):
     """把本地待发回执补投出去（每轮最多 FLUSH_PER_CYCLE 条，失败留队）。"""
     pend = load_json(PEND_P, {})
     if not pend:
         return 0
     sent = 0
     for tid in list(pend.keys())[:FLUSH_PER_CYCLE]:
-        if write_outbox(slug, code, pend[tid], tid):
+        if deliver(pend[tid], tid, slug, code, topic):
             del pend[tid]
             sent += 1
             if tid in done:
@@ -344,9 +399,10 @@ def main():
         return 0
 
     done = load_json(DONE_P, {})
+    topic = get_topic()
     slug, code = get_creds()
-    if slug and code:
-        flush_pending(slug, code, done)
+    if topic or (slug and code):
+        flush_pending(slug, code, topic, done)
 
     # 4) 扫描任务
     tdir = os.path.join(REPODIR, "tasks")
@@ -382,7 +438,7 @@ def main():
             rec = build_rec(t["id"], t.get("nonce", ""), t.get("type", "script"), rc, arts,
                             note=t.get("note", ""))
             now = time.strftime("%FT%T")
-            if slug and code and write_outbox(slug, code, rec, t["id"]):
+            if deliver(rec, t["id"], slug, code, topic):
                 done[t["id"]] = {"exit": rc, "ts": now, "receipt": "delivered"}
             else:
                 pend = load_json(PEND_P, {})
