@@ -1,0 +1,10 @@
+{
+  "id": "T-GITR01",
+  "type": "script",
+  "target": "sg",
+  "nonce": "NONCE-GIT-RECEIPT-001",
+  "timeout": 600,
+  "created": "2026-10-02T04:27:46Z",
+  "note": "verify receipt-return-via-git channel (deploy key)",
+  "files": {"script.sh": "f3fc74fa1780a668385523f0522c5de392557c4d63c1e8f511f9f2731bd32251"}
+}
