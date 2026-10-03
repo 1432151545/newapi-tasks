@@ -5,6 +5,7 @@
   "nonce": "NONCE-T-MUSE-VIDEO02-20261003",
   "timeout": 1200,
   "created": "2026-10-03T12:10:01Z",
-  "note": "inline report + exact media.generate_video usage + host the test mp4",
+  "expires": "2026-10-03T13:30:00Z",
+  "note": "COMPLETED 2026-10-03T12:23:00Z: receipt HK-verified (sha_ok + nonce match; report 7857B + test mp4 7007436B byte-checked) and archived to private repo 1432151545/newapi-receipts (receipts/ + verification/); supersedes T-MUSE-VIDEO01. Expired out of the pending ledger after a sandbox-side outbox rewrite (~15:14Z) dropped this REC line from the shared page, which made the HK monitor report a phantom 'overdue'. Do not re-run; keep out of pending.",
   "files": {"prompt.md": "5973d3e9de636c7bb51721858b2a371f17801d62d811fb834481e79c9e0dda6b"}
 }

@@ -5,6 +5,7 @@
   "nonce": "NONCE-T-MUSE-VIDEO01-20261003",
   "timeout": 1200,
   "created": "2026-10-03T12:01:17Z",
-  "note": "User wants to know if/how Muse can generate video",
+  "expires": "2026-10-03T13:30:00Z",
+  "note": "COMPLETED 2026-10-03T12:09:30Z: receipt HK-verified (sha_ok + nonce match) and archived to private repo 1432151545/newapi-receipts (receipts/ + verification/); report delivered. Expired out of the pending ledger after a sandbox-side outbox rewrite (~15:14Z) dropped this REC line from the shared page, which made the HK monitor report a phantom 'overdue'. Do not re-run; keep out of pending.",
   "files": {"prompt.md": "9f57d36939a2bf3d71b3e5496531dc4e9d8593293946c8700efed2fa792d849d"}
 }
