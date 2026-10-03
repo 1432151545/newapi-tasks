@@ -1,0 +1,10 @@
+{
+  "id": "T-MUSE-VIDEO02",
+  "type": "agent",
+  "target": "muse",
+  "nonce": "NONCE-T-MUSE-VIDEO02-20261003",
+  "timeout": 1200,
+  "created": "2026-10-03T12:10:01Z",
+  "note": "inline report + exact media.generate_video usage + host the test mp4",
+  "files": {"prompt.md": "5973d3e9de636c7bb51721858b2a371f17801d62d811fb834481e79c9e0dda6b"}
+}
