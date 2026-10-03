@@ -110,6 +110,35 @@ def parse(rec):
     return info
 
 
+def _norm_arts(arts):
+    """归一化回执 artifacts 到 [(name, dict), ...]（四种实测形状）：
+    1) dict-of-dicts  {name: {b64,size,sha256}}   —— 编码交付，有 inline 字节
+    2) list-of-dicts  [{path, sha256}, ...]        —— 路径+哈希，无 b64
+    3) dict-of-str    {name: "~/path/..."}         —— 纯路径字符串（VIDEO02 实测）
+    4) list-of-str    ["~/path/...", ...]          —— 纯路径字符串列表
+    永远返回 dict 值，杜绝 'str' has no attribute 'get' 崩溃。"""
+    if isinstance(arts, dict):
+        pairs = list(arts.items())
+    elif isinstance(arts, list):
+        pairs = []
+        for a in arts:
+            if isinstance(a, dict):
+                pairs.append((a.get("path") or a.get("name") or "?", a))
+            else:
+                pairs.append((str(a), {"path": a}))
+    else:
+        return []
+    out = []
+    for name, a in pairs:
+        if isinstance(a, dict):
+            out.append((name, a))
+        elif isinstance(a, str):
+            out.append((name, {"path": a}))
+        else:
+            out.append((name, {}))
+    return out
+
+
 def main():
     want = sys.argv[1:]
     t = topic()
@@ -135,10 +164,7 @@ def main():
             i["task"], i["src"], i["exit"], i["ts"], i["host"], i["nonce"]))
         print("  sha_ok = %s%s" % (i["sha_ok"], "" if i["sha_ok"] else "  <-- 不一致! " + i.get("err", "")))
         p = i.get("payload") or {}
-        arts = p.get("artifacts") or {}
-        items = arts.items() if isinstance(arts, dict) else ((a.get("path") or "?", a) for a in arts)
-        for name, a in items:
-            a = a or {}
+        for name, a in _norm_arts(p.get("artifacts")):
             print("  artifact %-14s size=%-7s sha=%s" % (
                 (name or "?").split("/")[-1], a.get("size", "-"), (a.get("sha256") or "")[:16]))
         note = p.get("note")
