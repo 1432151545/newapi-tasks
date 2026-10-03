@@ -1,0 +1,10 @@
+{
+  "id": "T-MUSE-VIDEO01",
+  "type": "agent",
+  "target": "muse",
+  "nonce": "NONCE-T-MUSE-VIDEO01-20261003",
+  "timeout": 1200,
+  "created": "2026-10-03T12:01:17Z",
+  "note": "User wants to know if/how Muse can generate video",
+  "files": {"prompt.md": "9f57d36939a2bf3d71b3e5496531dc4e9d8593293946c8700efed2fa792d849d"}
+}
