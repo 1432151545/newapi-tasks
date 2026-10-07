@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 # FETCH_TRANSPORT=curl
+# -*- coding: utf-8 -*-
 """bus_worker_relay.py — Muse 沙箱侧总线工人（零 GitHub 凭据，只用 HTTPS）
 
 HTTP 层（get / rentry_edit / fetch_blob 经由 get）一律 **curl 优先**、urllib 仅作回退：
