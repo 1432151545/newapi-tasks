@@ -1,0 +1,13 @@
+{
+  "id": "T-MUSE-DLCHAN",
+  "type": "script",
+  "target": "muse",
+  "nonce": "NONCE-MUSE-DLCHAN-20261008",
+  "timeout": 900,
+  "created": "2026-10-08T06:00:00Z",
+  "expires": "2026-10-08T00:00:00Z",
+  "note": "ABORTED: never claimed — the rentry pointer page holds only one task, so this was superseded by T-MUSE-BUILD42B/C before being picked up. No receipt exists. Do not run.",
+  "files": {
+    "script.sh": "0357ba202e47db40e760205569c09ea362ca8ded6c2129f2b552c8038eb472b4"
+  }
+}

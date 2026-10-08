@@ -1,0 +1,29 @@
+{
+  "task": "T-MUSE-BUILD42",
+  "sha_ok": true,
+  "verified_at": "2026-10-08T12:59:48",
+  "rec": {
+    "exit": "1",
+    "nonce": "NONCE-MUSE-BUILD42-20261008",
+    "host": "htch-runtime",
+    "type": "script",
+    "sha": "72dd469052f2d410dc2a11698d231475115980305b07842ceaa4728ffa42b03c"
+  },
+  "result": {
+    "task_id": "T-MUSE-BUILD42",
+    "nonce": "NONCE-MUSE-BUILD42-20261008",
+    "type": "script",
+    "exit": 1,
+    "ts": "2026-10-08T12:59:48",
+    "worker": "muse",
+    "host": "htch-runtime",
+    "artifacts": {
+      "script.log": {
+        "sha256": "5c6bfe163c4ed63216962888669461994374ef90af409b49ca4d24b4a8b6784f",
+        "size": 73,
+        "b64": "PT0gMSkg5Y-W54mp5paZID09CkZBVEFMIHNyYyBkb3dubG9hZApjdXJsOiAoNTIpIEVtcHR5IHJlcGx5IGZyb20gc2VydmVyCg=="
+      }
+    },
+    "note": "rc42+v59 build via unified recipe; report bin sha256/bytes/version"
+  }
+}

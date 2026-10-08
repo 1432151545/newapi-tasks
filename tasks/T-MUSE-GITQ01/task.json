@@ -1,0 +1,13 @@
+{
+  "id": "T-MUSE-GITQ01",
+  "type": "script",
+  "target": "muse",
+  "nonce": "NONCE-MUSE-GITQ01-20261008",
+  "timeout": 600,
+  "created": "2026-10-08T06:00:00Z",
+  "expires": "2026-10-08T00:00:00Z",
+  "note": "COMPLETED 2026-10-08T14:59:56Z (exit=0, sha_ok): git forensics — sandbox never pushes, all repos pull-only. Result archived in results/. Do not re-run.",
+  "files": {
+    "script.sh": "f0a2bc070552953b57760f5f9b4da0ce56989670feff47748e23b1e745a049db"
+  }
+}

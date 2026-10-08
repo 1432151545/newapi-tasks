@@ -1,0 +1,13 @@
+{
+  "id": "T-MUSE-BUILD42",
+  "type": "script",
+  "target": "muse",
+  "nonce": "NONCE-MUSE-BUILD42-20261008",
+  "timeout": 1800,
+  "created": "2026-10-08T06:00:00Z",
+  "expires": "2026-10-08T00:00:00Z",
+  "note": "FAILED 2026-10-08T12:59:48Z (exit=1): single-file 25MB download rejected at sandbox egress (curl: (52) Empty reply). Superseded by BUILD42B/C. Do not re-run.",
+  "files": {
+    "script.sh": "0bdfb721cbf964e666895e7710711b0c185272ebf2a7c2fb770bbd2cf8d76142"
+  }
+}

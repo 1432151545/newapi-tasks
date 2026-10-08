@@ -1,0 +1,35 @@
+{
+  "task": "T-MUSE-PROBE01",
+  "sha_ok": null,
+  "verified_at": "2026-10-08T12:46:56Z",
+  "rec": {
+    "exit": 0,
+    "nonce": "NONCE-MUSE-PROBE01-20261008",
+    "host": "htch-runtime",
+    "type": "script",
+    "sha": null
+  },
+  "provenance": "RECONSTRUCTED_FROM_SESSION_RECORD — 原始 REC 已滚出 rentry 回执页 23KB 窗口，本文件的结论取自当期会话记录，不是原始回执字节，勿当回执原件引用",
+  "result": {
+    "egress_ok": [
+      "files.catbox.moe",
+      "tmpfiles.org",
+      "d.uguu.se",
+      "dl.google.com",
+      "codeload.github.com"
+    ],
+    "egress_blocked": [
+      "catbox.moe upload",
+      "litterbox upload"
+    ],
+    "small_file_byte_exact": true,
+    "tools": {
+      "unshare": true,
+      "git": true,
+      "node": true,
+      "docker": false,
+      "go": false
+    },
+    "disk_free": "98G"
+  }
+}

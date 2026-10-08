@@ -1,0 +1,13 @@
+{
+  "id": "T-MUSE-BUILD42C",
+  "type": "script",
+  "target": "muse",
+  "nonce": "NONCE-MUSE-BUILD42C-20261008",
+  "timeout": 1800,
+  "created": "2026-10-08T06:00:00Z",
+  "expires": "2026-10-08T00:00:00Z",
+  "note": "FAILED 2026-10-08T14:55:42Z (exit=4): dual-channel chunked download still throttled at sandbox egress. Muse leg abandoned for this release; rc.42+v59 was validated and shipped from the SG leg instead. Do not re-run.",
+  "files": {
+    "script.sh": "63b38c116278cf0f049a9d5989396e45777b76edd1385593556c1f33535a67ff"
+  }
+}

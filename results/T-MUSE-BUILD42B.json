@@ -1,0 +1,29 @@
+{
+  "task": "T-MUSE-BUILD42B",
+  "sha_ok": true,
+  "verified_at": "2026-10-08T14:01:13",
+  "rec": {
+    "exit": "2",
+    "nonce": "NONCE-MUSE-BUILD42B-20261008",
+    "host": "htch-runtime",
+    "type": "script",
+    "sha": "3638c3d938a800014c849f6ea8a6703f9367ca6ceb7cf14559379fc8c61c6563"
+  },
+  "result": {
+    "task_id": "T-MUSE-BUILD42B",
+    "nonce": "NONCE-MUSE-BUILD42B-20261008",
+    "type": "script",
+    "exit": 2,
+    "ts": "2026-10-08T14:01:13",
+    "worker": "muse",
+    "host": "htch-runtime",
+    "artifacts": {
+      "script.log": {
+        "sha256": "a252cc7f3a718f415d151fdc774cc7a8baed3abdd16a0ea5bb8587f0780f4f31",
+        "size": 428,
+        "b64": "PT0gMSkg5YiG54mH5LiL6L29ID09CiAgcmV0cnkgcGFydDEgdHJ5MSBnb3Q9IHdhbnQ9MGExY2ZiM2NmNjdjNDc5NQogIHBhcnQxIE9LIDMxNDU3MjggQgogIHBhcnQyIE9LIDMxNDU3MjggQgogIHJldHJ5IHBhcnQzIHRyeTEgZ290PSB3YW50PTQ4MDlhYTM2MjBjMDk0MDMKICBwYXJ0MyBPSyAzMTQ1NzI4IEIKICBwYXJ0NCBPSyAzMTQ1NzI4IEIKICByZXRyeSBwYXJ0NSB0cnkxIGdvdD0gd2FudD0zNWRhM2MwZDE3MTFhMGM3CiAgcGFydDUgT0sgMzE0NTcyOCBCCiAgcmV0cnkgcGFydDYgdHJ5MSBnb3Q9IHdhbnQ9M2I4MWQ5ZGExYTI4ODk2OQogIHJldHJ5IHBhcnQ2IHRyeTIgZ290PSB3YW50PTNiODFkOWRhMWEyODg5NjkKICByZXRyeSBwYXJ0NiB0cnkzIGdvdD0gd2FudD0zYjgxZDlkYTFhMjg4OTY5CkZBVEFMIHBhcnQ2IHNoYSBtaXNtYXRjaAo="
+      }
+    },
+    "note": "rc42+v59 chunked delivery build via unified recipe"
+  }
+}

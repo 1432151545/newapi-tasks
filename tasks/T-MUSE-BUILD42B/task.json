@@ -1,0 +1,13 @@
+{
+  "id": "T-MUSE-BUILD42B",
+  "type": "script",
+  "target": "muse",
+  "nonce": "NONCE-MUSE-BUILD42B-20261008",
+  "timeout": 1800,
+  "created": "2026-10-08T06:00:00Z",
+  "expires": "2026-10-08T00:00:00Z",
+  "note": "FAILED 2026-10-08T14:01:13Z (exit=2): chunked download, part 6 lost 3 consecutive attempts. Superseded by BUILD42C. Do not re-run.",
+  "files": {
+    "script.sh": "08c2777172cbbf05e69ab1edca16d77f04709b1bf17b00a40fb7002528b815bd"
+  }
+}

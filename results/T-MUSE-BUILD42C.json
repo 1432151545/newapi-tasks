@@ -1,0 +1,29 @@
+{
+  "task": "T-MUSE-BUILD42C",
+  "sha_ok": true,
+  "verified_at": "2026-10-08T14:55:42",
+  "rec": {
+    "exit": "4",
+    "nonce": "NONCE-MUSE-BUILD42C-20261008",
+    "host": "htch-runtime",
+    "type": "script",
+    "sha": "b18c383f707eee1589cb09b1f45781d2d4893237201389861d0b22bf40222f51"
+  },
+  "result": {
+    "task_id": "T-MUSE-BUILD42C",
+    "nonce": "NONCE-MUSE-BUILD42C-20261008",
+    "type": "script",
+    "exit": 4,
+    "ts": "2026-10-08T14:55:42",
+    "worker": "muse",
+    "host": "htch-runtime",
+    "artifacts": {
+      "script.log": {
+        "sha256": "3dec14c2b7712fe9391a62b54dab01246024f88f70bc61288e242d4040030bd0",
+        "size": 691,
+        "b64": "PT0gMSkg5YiG54mH5LiL6L2977yI5Y-M6YCa6YGT5Lqk5pu_77yM5pyA5aSaIDQg6L2u77yJPT0KICBwYXJ0MSBPSyAzMTQ1NzI4IEIKICBwYXJ0MiBPSyAzMTQ1NzI4IEIKICByZXRyeSBwYXJ0MyB0cnkxIHNyYz1jYXRib3ggZ290PSB3YW50PTQ4MDlhYTM2MjBjMAogIHBhcnQzIE9LIDMxNDU3MjggQgogIHBhcnQ0IE9LIDMxNDU3MjggQgogIHBhcnQ1IE9LIDMxNDU3MjggQgogIHJldHJ5IHBhcnQ2IHRyeTEgc3JjPWNhdGJveCBnb3Q9IHdhbnQ9M2I4MWQ5ZGExYTI4CiAgcGFydDYgT0sgMzE0NTcyOCBCCiAgcmV0cnkgcGFydDcgdHJ5MSBzcmM9Y2F0Ym94IGdvdD0gd2FudD00ZTAwNmM1M2VhZDYKICBwYXJ0NyBPSyAzMTQ1NzI4IEIKICByZXRyeSBwYXJ0OCB0cnkxIHNyYz1jYXRib3ggZ290PSB3YW50PTE5OTEzZDA2OTFhNwogIHBhcnQ4IE9LIDMxNDU3MjggQgogIHJldHJ5IHBhcnQ5IHRyeTEgc3JjPWNhdGJveCBnb3Q9IHdhbnQ9Mzg2MDEyM2ZhOTIzCiAgcGFydDkgT0sgMjQ1NDAyIEIKICBzcmMudGd6IGJ5dGVzPTI1NDExMjI2IHNoYT1iYjhmMzIyZmE1ODM3MDk1NTM1MTZlMzQyMDQ1MGYzNzQ3Mjk3NDU0YWQ5ZGYyMTE4YjAzZTFkNjM0YTQzNTJkCiAgV0hPTEVfT0sKPT0gMikg6YWN5pa5ICsg5bel5YW36ZO-ID09CkZBVEFMIHJlY2lwZQpjdXJsOiAoNTIpIEVtcHR5IHJlcGx5IGZyb20gc2VydmVyCg=="
+      }
+    },
+    "note": "rc42+v59 build; chunks dual-channel retry"
+  }
+}
