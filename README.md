@@ -48,3 +48,35 @@ REC|task=<id>|nonce=<n>|exit=<rc>|type=<t>|ts=<iso>|host=<h>|sha=<sha256(结果J
 - **本仓库公开**：任务内容不得含任何密钥/凭据/隐私数据
 - 任务文本里如需保密信息，只写占位符，真实值由沙箱侧从既有通道（指针页）获取
 - 轮询器零凭据：读库匿名、回写用回写页 edit_code（从指针页运行时获取，本地缓存兜底）
+
+## 多账号（2026-10-09）
+
+两台 Muse 沙箱（不同账号）共用本任务库，靠 **role** 区分，互不抢任务：
+
+```bash
+# muse1（默认，等价于旧行为）——不用做任何事
+# muse2（第二台沙箱）——引导时显式带角色
+BUS_ROLE=muse2 bash bootstrap.sh
+```
+
+角色决定：认领 `target==角色` 或 `target==any` 的任务；心跳的 `role` 字段。
+**不传 BUS_ROLE 的第二台机器会退化成第二个 muse，与 muse1 抢同一批任务** —— 所以
+bootstrap.sh 有硬断言：非法角色退出 2；状态目录里已有别人台账时退出 3。
+
+### 回写页必须一账号一页（否则会吞掉对方的回执）
+
+沙箱出口代理把响应掐在 ~23KB，而回写页是「读-改-写」：读不全 → 合并时把看不见的
+REC 行整行丢掉。实测：共用一页时，第二台机器写一次回执，页面从 10 条 REC 掉到 4 条。
+所以：
+
+- 指针页 `hermes-muse-ptr` 支持**按角色**的字段：`outbox_slug_<role>` / `outbox_code_<role>`，
+  没有则回退通用 `outbox_slug` / `outbox_code`（单账号行为不变）。
+- 每个账号自己的回写页凭据，放在对应 `outbox_*_<role>` 字段里；引导时无需把凭据写进粘贴文本。
+- HK 侧核验 `verify_rec.py` 会一并读 `/root/muse-deploy/bus-info*.txt` 里列出的所有回写页。
+
+### 发布任务到指定账号
+
+```bash
+./pub.sh <id> <type> <target> <nonce> <timeout> <dir> [note]
+# target=muse2 就只有 muse2 会认领；target=muse 只有 muse1
+```

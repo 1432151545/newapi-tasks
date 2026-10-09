@@ -234,7 +234,12 @@ def _conf_read():
 
 
 def get_creds(force=False):
-    """outbox 凭据：env > 30 分钟内缓存 > 指针页 > 陈旧缓存兜底。"""
+    """outbox 凭据：env > 30 分钟内缓存 > 指针页 > 陈旧缓存兜底。
+
+    多账号（2026-10-09）：先看**角色专属**字段 `outbox_slug_<ROLE>` / `outbox_code_<ROLE>`
+    （如 role=muse2 → outbox_slug_muse2），没有才回退到通用 `outbox_slug`/`outbox_code`。
+    这样各账号各自一页，单账号旧行为不变（无专属字段时与从前完全一致）。
+    """
     slug = os.environ.get("BUS_OUT_SLUG")
     code = os.environ.get("BUS_OUT_CODE")
     if slug and code:
@@ -249,7 +254,8 @@ def get_creds(force=False):
             pass
     try:
         txt = textarea(PTR_SLUG)
-        s2, c2 = field(txt, "outbox_slug"), field(txt, "outbox_code")
+        s2 = field(txt, "outbox_slug_%s" % ROLE) or field(txt, "outbox_slug")
+        c2 = field(txt, "outbox_code_%s" % ROLE) or field(txt, "outbox_code")
         if s2 and c2:
             try:
                 os.makedirs(STATE, exist_ok=True)

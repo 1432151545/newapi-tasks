@@ -5,8 +5,9 @@
   "nonce": "NONCE-GIT-BRIDGE-001",
   "timeout": 600,
   "created": "2026-10-02T01:50:00Z",
-  "note": "first task over the public git channel (newapi-tasks)",
+  "note": "COMPLETED+archived 2026-10-02; expiring so a fresh sandbox (e.g. muse2) never re-runs it",
   "files": {
     "script.sh": "b71dfd8301148d396585d27d1b8ca90355a0b82733cc723308ce98cac0e23fd8"
-  }
+  },
+  "expires": "2026-10-02T00:00:00Z"
 }

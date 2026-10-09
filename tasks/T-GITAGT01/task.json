@@ -5,6 +5,9 @@
   "nonce": "NONCE-GIT-AGT-300",
   "timeout": 1800,
   "created": "2026-10-02T02:28:31Z",
-  "note": "agent channel E2E: claim->inbox->executor->outbox REC",
-  "files": {"prompt.md": "ab6b22a8c43dcfe529e0283169bb5beee3e0e43ca7035b3a55e4a9f24f694e04"}
+  "note": "COMPLETED+archived 2026-10-02; expiring so a fresh sandbox (e.g. muse2) never re-runs it",
+  "files": {
+    "prompt.md": "ab6b22a8c43dcfe529e0283169bb5beee3e0e43ca7035b3a55e4a9f24f694e04"
+  },
+  "expires": "2026-10-02T00:00:00Z"
 }

@@ -78,18 +78,36 @@ def from_ntfy(t):
     return out
 
 
+def _outbox_confs():
+    """All receipt-outbox credential files: muse1 (bus-info.txt) + any bus-info-<role>.txt.
+    多账号（2026-10-09）：每个 Muse 账号有独立回写页，核验要一起读。
+    单账号旧行为不变（只有 bus-info.txt 存在时，行为与从前逐字节一致）。"""
+    paths = [BUSINFO]
+    try:
+        d = os.path.dirname(BUSINFO)
+        for fn in sorted(os.listdir(d)):
+            if fn.startswith("bus-info-") and fn.endswith(".txt"):
+                paths.append(os.path.join(d, fn))
+    except Exception:
+        pass
+    out = []
+    for p in paths:
+        c = _conf(p)
+        if c.get("slug"):
+            out.append((os.path.basename(p), c["slug"]))
+    return out
+
+
 def from_rentry():
     out = []
-    slug = _conf(BUSINFO).get("slug", "")
-    if not slug:
-        return out
-    try:
-        h = fetch("https://rentry.co/%s/edit" % slug)
-        m = re.search(r"<textarea[^>]*>(.*?)</textarea>", h, re.S)
-        txt = _h.unescape(m.group(1)) if m else ""
-        out = [l for l in txt.splitlines() if l.startswith("REC|")]
-    except Exception as e:
-        print("  ! rentry 读失败: %s" % str(e)[:90], file=sys.stderr)
+    for label, slug in _outbox_confs():
+        try:
+            h = fetch("https://rentry.co/%s/edit" % slug)
+            m = re.search(r"<textarea[^>]*>(.*?)</textarea>", h, re.S)
+            txt = _h.unescape(m.group(1)) if m else ""
+            out += [l for l in txt.splitlines() if l.startswith("REC|")]
+        except Exception as e:
+            print("  ! rentry 读失败 (%s): %s" % (label, str(e)[:90]), file=sys.stderr)
     return out
 
 
