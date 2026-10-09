@@ -1,0 +1,10 @@
+{
+  "id": "T-MUSE2-PROBE01",
+  "type": "script",
+  "target": "muse2",
+  "nonce": "NONCE-MUSE2-PROBE01-20261009",
+  "timeout": 300,
+  "created": "2026-10-09T04:44:42Z",
+  "note": "muse2 first-task E2E probe",
+  "files": {"script.sh": "4b575981e872a8d848fcc233307d794189bc255f03c24b54cfb7baf3c81d40a2"}
+}
