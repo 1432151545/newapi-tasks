@@ -1,0 +1,10 @@
+{
+  "id": "T-MUSE-AGENTCHK02",
+  "type": "agent",
+  "target": "muse",
+  "nonce": "NONCE-MUSE-AGENTCHK02-20261010",
+  "timeout": 900,
+  "created": "2026-10-10T09:29:47Z",
+  "note": "agent-leg liveness probe (read-only); target=muse (repo role for box1)",
+  "files": {"prompt.md": "b38ab63885869f77b220a56eb92d372cdfdb59f516e8967e0716d56fc6739a7a"}
+}
