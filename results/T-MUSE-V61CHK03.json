@@ -1,0 +1,40 @@
+{
+  "task": "T-MUSE-V61CHK03",
+  "sha_ok": true,
+  "verified_at": "2026-10-10T11:08:12Z",
+  "goal": "push new-api v61 (rc.43) into the muse1 sandbox, install, start, verify",
+  "channel": "rentry pointer page hermes-muse-ptr (script leg, target=muse) + GitHub release asset delivery",
+  "delivery": {
+    "repo": "1432151545/newapi-artifacts (public)",
+    "asset": "https://github.com/1432151545/newapi-artifacts/releases/download/v61-rc43-20261010/new-api-rc43-v61.gz",
+    "why": "catbox was unreachable from the sandbox this round (5x 0 bytes); the sandbox CAN reach github (it pulls the task repo hourly), so the 41MB gz ships as a single release asset — no chunking needed."
+  },
+  "result": "SUCCESS — v61 installed at ~/newapi-test/new-api and running on :3000.",
+  "evidence": {
+    "gz_bytes": 41393225,
+    "gz_sha256": "29413222d24283a8281d577198d2904823980d07f8ea4836a4a2c9ffbc89679e",
+    "bin_sha256": "566fba68e8b4b9590e42f5acb48175e2240638668d1071dab80bcd954cf0615b",
+    "bin_bytes": 135045282,
+    "listening": "*:3000 (new-api pid=7767)",
+    "local_http": 200,
+    "ready_ms": 456,
+    "version_string": "v1.0.0-rc.43",
+    "markers": {
+      "reapplyEmptyResponseRefund": 1,
+      "upstreamHungWithoutFirstByte": 1,
+      "EmptyResponseRefund": 1,
+      "MarkUserSubscriptionsExhausted": 1,
+      "TriggerInviterRewardIfEligible": 3
+    }
+  },
+  "limitations": {
+    "relay_smoke": "setup=200 but login FAILED — the sandbox SQLite DB is pre-existing (initialized 2026-10-01 with a different admin password), so no token could be minted for the channel/token/chat leg. Not a v61 defect.",
+    "pinggy_tunnel": "not established (ssh via the squid egress proxy reset). Sandbox is therefore not reachable from HK — verification is sandbox-local, evidence returned via the rentry receipt."
+  },
+  "process_notes": [
+    "T-MUSE-V61CHK01 (catbox chunks): FAILED exit=2 — catbox unreachable from sandbox (all parts 0 bytes).",
+    "T-MUSE-V61CHK02: FAILED exit=1 — my own bug: literal __WHOLE__ placeholder left in the published script under set -u.",
+    "T-MUSE-V61CHK03: SUCCESS (this record)."
+  ],
+  "script_log": "== 0) env ==\n  host=htch-runtime date=2026-10-10T11:07:20Z\n  python3=/usr/bin/python3 curl=/usr/bin/curl strings=/usr/bin/strings\n== 1) download v61.gz from GitHub release asset ==\n  gz OK bytes=41393225\n== 2) gunzip + install ==\n  bin sha=566fba68e8b4b9590e42f5acb48175e2240638668d1071dab80bcd954cf0615b size=135045282\n== 3) start (port 3000, SQLite) ==\n  listen:\nLISTEN 0      0                  *:3000            *:*    users:((\"new-api\",pid=7767,fd=11))\n  local_http=200\n  --- newapi.log tail ---\n[SYS] 2026/10/10 - 11:07:28 | SQL_DSN not set, using SQLite as database \n[SYS] 2026/10/10 - 11:07:29 | database migration started \n\n2026/10/10 11:07:29 \u001b[32m/root/go/pkg/mod/github.com/glebarez/sqlite@v1.11.0/migrator.go:342\n\u001b[0m\u001b[33m[0.180ms] \u001b[34;1m[rows:1]\u001b[0m SELECT * FROM PRAGMA_index_list(\"options\")\n[SYS] 2026/10/10 - 11:07:29 | system is already initialized at: 2026-10-01 13:56:04 +0000 UTC \n[SYS] 2026/10/10 - 11:07:29 | REDIS_CONN_STRING not set, Redis is not enabled \n[SYS] 2026/10/10 - 11:07:29 | i18n initialized with languages: zh-CN, zh-TW, en \n[SYS] 2026/10/10 - 11:07:29 | Loaded 0 custom OAuth providers \n[SYS] 2026/10/10 - 11:07:29 | New API  started \n2026/10/10 11:07:29 WARNING: TRUSTED_PROXIES is unset or blank; trusting loopback, RFC 1918, and IPv6 ULA proxy addresses for compatibility. Set TRUSTED_PROXIES=none to trust no proxies, or configure explicit proxy IPs/CIDRs to replace these defaults.\n[INFO] 2026/10/10 - 11:07:29 | SYSTEM | codex credential auto-refresh task started: tick=10m0s threshold=24h0m0s \n[SYS] 2026/10/10 - 11:07:29 | updating dashboard data... \n[SYS] 2026/10/10 - 11:07:29 | saved dashboard data, 0 records \n[INFO] 2026/10/10 - 11:07:29 | SYSTEM | subscription quota reset task started: tick=1m0s \n[INFO] 2026/10/10 - 11:07:29 | SYSTEM | system task runner started: runner=htch-runtime-NsHF09zC idle_interval=15s \n\n  \u001b[33mWarning: Refresh cookie is not secure and refresh/logout Origin validation is disabled. Please set SESSION_COOKIE_SECURE=true in production.\u001b[0m\n\n\n  \u001b[32mNew API \u001b[0m  ready in 456 ms\n\n  ➜  \u001b[1mLocal:  \u001b[0m http://localhost:3000/\n\n[GIN] 2026/10/10 - 11:07:40 | web | 202610101107408184959838268d9d65LK98suY | 200 |    5.189789ms |       127.0.0.1 |     GET /\n== 4) version + markers ==\n  verstring=v1.0.0-rc.43\n  marker reapplyEmptyResponseRefund = 1\n  marker upstreamHungWithoutFirstByte = 1\n  marker EmptyResponseRefund = 1\n  marker MarkUserSubscriptionsExhausted = 1\n  marker TriggerInviterRewardIfEligible = 3\n== 5) relay smoke (mock upstream -> channel -> token -> chat) ==\nRELAY_SMOKE={\"setup\": 200, \"login\": 200, \"login_parse\": \"{\\\"message\\\":\\\"Username or password is incorrect, or user has been banned\\\",\\\"message_key\\\":\\\"Username or password is incorrect, or user has been banned\\\",\\\"success\\\":false}\"}\n== 6) pinggy tunnel (best-effort) ==\n  tunnel_url=\nPseudo-terminal will not be allocated because stdin is not a terminal.\nkex_exchange_identification: read: Connection reset by peer\nConnection reset by 198.19.0.1 port 3128\nV61_INSTALL_DONE\n"
+}
