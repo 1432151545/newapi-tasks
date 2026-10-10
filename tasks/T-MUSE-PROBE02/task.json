@@ -5,6 +5,7 @@
   "nonce": "NONCE-MUSE-PROBE02-20261010",
   "timeout": 300,
   "created": "2026-10-10T07:47:45Z",
-  "note": "muse1 liveness + bus E2E probe (user-requested 2026-10-10)",
+  "expires": "2026-10-10T00:00:00Z",
+  "note": "SUPERSEDED — DO NOT RUN FROM GIT. Script-type tasks now go ONLY to the rentry pointer page (hermes-muse-ptr) per the 2026-10-10 channel rules; a repo-side poller will never claim this. The 15:47 git copy was orphaned, so it was re-dispatched via the pointer page and COMPLETED 2026-10-10T16:54:56 CST (exit=0, sha_ok=True, worker=muse, host=htch-runtime). Receipt archived in results/T-MUSE-PROBE02.json. Expired so it drops out of any pending ledger.",
   "files": {"script.sh": "8b0c0800a74efad670bd28cd63717198e1b2c3774b4f41deb29ce41d64b9ad0b"}
 }
