@@ -1,0 +1,10 @@
+{
+  "id": "T-MUSE-PROBE02",
+  "type": "script",
+  "target": "muse",
+  "nonce": "NONCE-MUSE-PROBE02-20261010",
+  "timeout": 300,
+  "created": "2026-10-10T07:47:45Z",
+  "note": "muse1 liveness + bus E2E probe (user-requested 2026-10-10)",
+  "files": {"script.sh": "8b0c0800a74efad670bd28cd63717198e1b2c3774b4f41deb29ce41d64b9ad0b"}
+}
