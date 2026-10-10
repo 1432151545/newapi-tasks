@@ -1,0 +1,10 @@
+{
+  "id": "T-MUSE-V61VERIFY01",
+  "type": "agent",
+  "target": "muse1",
+  "nonce": "NONCE-MUSE-V61VERIFY01-20261010",
+  "timeout": 1800,
+  "created": "2026-10-10T12:14:14Z",
+  "note": "NewAPI v1.0.0-rc.43 (version-bake fixed) autonomous verification by muse1",
+  "files": {"prompt.md": "a78b1dc39a7f94ca76e9dd6cacc60286e23d1cc12954c13a2b25bd37656ad486"}
+}
