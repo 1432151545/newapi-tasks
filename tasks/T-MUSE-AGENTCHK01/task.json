@@ -1,0 +1,10 @@
+{
+  "id": "T-MUSE-AGENTCHK01",
+  "type": "agent",
+  "target": "muse1",
+  "nonce": "NONCE-MUSE-AGENTCHK01-20261010",
+  "timeout": 900,
+  "created": "2026-10-10T09:23:24Z",
+  "note": "agent-leg liveness probe (read-only); target=muse1 per operator 2026-10-10",
+  "files": {"prompt.md": "b24ed61c94486cccbb7eb89485591c09333f0fb6ddb8ce6e8e10458fa9ae865c"}
+}
