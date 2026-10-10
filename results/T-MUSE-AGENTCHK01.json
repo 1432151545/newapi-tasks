@@ -1,0 +1,32 @@
+{
+  "task": "T-MUSE-AGENTCHK01",
+  "sha_ok": true,
+  "verified_at": "2026-10-10T10:00:32Z",
+  "channel": "git task repo (1432151545/newapi-tasks) -> agent executor -> rentry outbox hermes-rx-r6qytd4",
+  "leg": "agent",
+  "target": "muse1",
+  "result": "CONFIRMED — agent leg works. Executor claimed CHK01 at the 18:00 CST (10:00:06Z) hourly round; exit=0; sha_ok=True.",
+  "rec": {
+    "exit": 0,
+    "type": "agent",
+    "ts": "2026-10-10T10:00:06Z",
+    "host": "htch-runtime",
+    "sha": "34e4d8150d24eb2c26fa52551189c413687c3151c4f803793b1c227ef6b073a6",
+    "raw_bytes": 677
+  },
+  "report": {
+    "home_free": "/home/hatch on /dev/mapper/rv: 100G total, 97G avail, 3% used",
+    "host": "htch-runtime",
+    "last_agent_activity": "2026-10-03T12:14:57Z (T-MUSE-VIDEO02 claimed, finished 12:24Z) — last actual task execution; all executor rounds 2026-10-04..2026-10-10 idle, bus_worker last bus.log 2026-10-10 01:42:57Z, no poller/watchdog/watcher processes currently running",
+    "nonce": "NONCE-MUSE-AGENTCHK01-20261010",
+    "nproc": 2,
+    "processes": [],
+    "task_id": "T-MUSE-AGENTCHK01",
+    "utc": "2026-10-10T10:00:06Z"
+  },
+  "notes": [
+    "Published 09:23:24Z; claimed at the 10:00:06Z hourly round (~37 min later) — agent leg is HOURLY, not immediate.",
+    "target MUST be muse1 for this leg (muse is the rentry-leg role).",
+    "Executor is ~/workspace/bin agent executor in agent_exec.log; the retired muse_git_poller.py is unrelated and stays dead."
+  ]
+}
