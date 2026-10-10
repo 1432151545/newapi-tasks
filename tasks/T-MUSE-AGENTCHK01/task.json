@@ -5,6 +5,7 @@
   "nonce": "NONCE-MUSE-AGENTCHK01-20261010",
   "timeout": 900,
   "created": "2026-10-10T09:23:24Z",
-  "note": "agent-leg liveness probe (read-only); target=muse1 per operator 2026-10-10",
+  "expires": "2026-10-10T00:00:00Z",
+  "note": "COMPLETED — agent-leg liveness probe; REC exit=0 host=htch-runtime ts=2026-10-10T10:00:06Z, HK-verified & archived (verification/T-MUSE-AGENTCHK01.json). Writeback line later swallowed by outbox content-rewind; expired out of the pending ledger so it stops showing as permanently overdue. Do not re-run.",
   "files": {"prompt.md": "b24ed61c94486cccbb7eb89485591c09333f0fb6ddb8ce6e8e10458fa9ae865c"}
 }
