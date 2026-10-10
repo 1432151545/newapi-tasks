@@ -1,0 +1,40 @@
+{
+  "task": "T-MUSE-PROBE02",
+  "sha_ok": true,
+  "verified_at": "2026-10-10T08:56:00Z",
+  "verified_by": "HK independent recompute (verify_rec.py from_rentry/parse) + sha256(payload)==REC.sha",
+  "rec": {
+    "exit": 0,
+    "type": "script",
+    "nonce": "NONCE-MUSE-PROBE02-20261010",
+    "host": "htch-runtime",
+    "ts": "2026-10-10T16:54:56",
+    "sha": "c7bb6e9e6183a89bbbffada271a8604a89137e2970a2e0b9f9ebb7e61fe6ffb1",
+    "channel": "rentry outbox hermes-rx-r6qytd4"
+  },
+  "note": "muse1 liveness + bus E2E probe (re-dispatched via rentry pointer page 2026-10-10; the 15:47 git copy is orphaned under the new channel rules)",
+  "artifacts": [
+    {
+      "name": "script.log",
+      "bytes": 5480,
+      "sha256": "c50628fd605dad1fe0e02d4c4de5040273626b529e4b105352a37f64da0d9238",
+      "recomputed_match": true
+    }
+  ],
+  "result": {
+    "leg_alive": true,
+    "bus_worker_hb": "HB ts=2026-10-10T16:35:45 ver=v5 role=muse host=htch-runtime (fresh => runtime-layer worker cron alive)",
+    "git_poller": "absent (muse_git_poller.py not found; old 60s nohup loop spams 'No such file'); git-published copy orphaned -> delivered via rentry",
+    "sandbox_newapi_service": {
+      "local_3000_http": "000 (down)",
+      "tunnel_url_txt": "https://shapi-87-81-230-9.free.pinggy.net (stale)"
+    },
+    "egress_ok": [
+      "github.com",
+      "codeload.github.com (rc.43 tarball)",
+      "rentry.co/hermes-muse-ptr/edit"
+    ],
+    "host": "htch-runtime 2C/7.9G, /home/hatch 97G free, overlay 7.5G"
+  },
+  "archived_private_repo": "1432151545/newapi-receipts receipts/T-MUSE-PROBE02.{rec,json} + verification/T-MUSE-PROBE02.json (readback byte-equal verified)"
+}
