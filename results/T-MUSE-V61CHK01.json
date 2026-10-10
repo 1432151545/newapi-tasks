@@ -1,0 +1,17 @@
+{
+  "task": "T-MUSE-V61CHK01",
+  "sha_ok": true,
+  "verified_at": "2026-10-10T10:28:58Z",
+  "channel": "rentry pointer page hermes-muse-ptr -> outbox hermes-rx-r6qytd4 (script leg, target=muse)",
+  "goal": "push new-api v61 (rc.43) gz into the sandbox, install, start, verify version/markers/health + relay smoke",
+  "outcome": "FAILED at step 1 — chunk delivery. exit=2 (script's own FATAL on part sha mismatch).",
+  "rec": {
+    "exit": 2,
+    "host": "htch-runtime",
+    "worker": "muse",
+    "sha": "ab6e3bc53fe6562ea973515d84b2b195136618e67d9de05fd8411278"
+  },
+  "root_cause": "Sandbox egress returned 0 bytes for every catbox fetch (part1 got= on all 5 tries). catbox worked from the sandbox on 2026-10-08 (BUILD42C 9/9) — so this is an egress/host reachability regression, not the task script.",
+  "script_log": "== 0) env ==\n  host=htch-runtime date=2026-10-10T10:27:14Z\n  python3=/usr/bin/python3 curl=/usr/bin/curl strings=/usr/bin/strings\n== 1) download 14 chunks (3MiB each, catbox) ==\n  retry part1 try1 got= want=5c34ef1d1f68\n  retry part1 try2 got= want=5c34ef1d1f68\n  retry part1 try3 got= want=5c34ef1d1f68\n  retry part1 try4 got= want=5c34ef1d1f68\n  retry part1 try5 got= want=5c34ef1d1f68\nFATAL part1 sha mismatch\n",
+  "next": "T-MUSE-NETPROBE01 dispatched to find a reachable file host; will re-upload chunks there and resend."
+}
