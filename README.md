@@ -42,11 +42,13 @@ results/<id>.json         HK 核验通过后的结果归档
 
 | 任务类型 | 走得通道 | 认领方 | target 写法 |
 |---|---|---|---|
-| **type=agent** | **git 任务库（本仓库）** | Muse 原生 agent / worker | `muse`（muse1）/ `muse2` |
-| **type=script** | **rentry 指针页 `hermes-muse-ptr` 的 `task_*` 字段** | 总线工人（只读指针页） | `muse` / `muse2` |
+| **type=agent** | **git 任务库（本仓库）** | Muse 原生 agent executor（**每小时整点**一轮） | `muse1`（box1）/ `muse2` |
+| **type=script** | **rentry 指针页 `hermes-muse-ptr` 的 `task_*` 字段** | 总线工人 `bus_worker.py`（只读指针页） | `muse`（box1，注意**不是** muse1）/ `muse2` |
+
+⚠️ **两条腿的 target 串不一样，别搞混**：git/agent 腿认 **`muse1`**；rentry/script 腿认 **`muse`**（bus_worker 的 HB role 就是 `muse`）。写反了任务静默不接（实测：agent 探针 target=muse → executor 记 "targets seen: any/sg/muse/muse2, 0 eligible"）。
 
 - **不要再把 `type=script` 推到 git 库**——总线工人只读指针页，不读 git 库；推到 git 的 script 任务无人认领。
-- git 库只发 `type=agent` 且 `target` 写 `muse` 或 `muse2`（指定接收方）。
+- git 库只发 `type=agent` 且 `target` 写 **`muse1`** 或 `muse2`（指定接收方）。
 - script 任务改走指针页时用 `/root/muse-deploy/rentry_set.py` **按字段改写** `task_id/task_type/task_nonce/task_sha/task_b64`
   （`bus_ctl.py task` / `update_pointer.sh` 会整页重写、静默丢掉未显式回传的字段如 `outbox_slug_muse2`）。
 - 指针页 `task_b64` = base64url(任务 JSON，去 padding)，`task_sha` = sha256(同一份原始字节)；
