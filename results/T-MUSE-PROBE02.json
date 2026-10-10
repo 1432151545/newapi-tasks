@@ -3,6 +3,8 @@
   "sha_ok": true,
   "verified_at": "2026-10-10T08:54:56Z",
   "channel": "rentry pointer page (hermes-muse-ptr) -> outbox hermes-rx-r6qytd4",
+  "verified_by": "HK independent recompute x2 — (a) verify_rec.py (from_rentry/parse) + sha256(payload)==REC.sha; (b) the 5-min receipt-monitor cron (job 4b581557020b) independently re-verified the same REC at 2026-10-10T08:56Z. Both agree: payload_sha_ok=True, exit=0, artifact sha match.",
+  "archived_private_repo": "1432151545/newapi-receipts receipts/T-MUSE-PROBE02.{rec,json} + verification/T-MUSE-PROBE02.json — HK re-cloned and read back byte-equal (artifact recomputed_sha256 == declared).",
   "provenance": "re-dispatched 2026-10-10 ~16:52 CST as a type=script task on the rentry pointer page, after the 15:47 git copy of this task was found orphaned under the new channel rules. REC sha recomputed independently by HK (verify_rec.py + inline check) — sha_ok=True.",
   "rec": {
     "exit": 0,
