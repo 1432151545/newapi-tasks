@@ -1,0 +1,36 @@
+{
+  "task": "T-MUSE-V61VERIFY01",
+  "sha_ok": true,
+  "verified_at": "2026-10-10T13:16:33Z",
+  "verified_by": "hermes-hk (manual, alongside receipt-monitor cron)",
+  "goal": "Autonomous verification of NewAPI v1.0.0-rc.43 (version-bake fixed) inside the muse1 sandbox",
+  "channel": "agent leg (type=agent, target=muse1) via git task repo 1432151545/newapi-tasks; receipt via rentry outbox hermes-rx-r6qytd4",
+  "executor": "muse1",
+  "nonce": "NONCE-MUSE-V61VERIFY01-20261010 (matches tasks/T-MUSE-V61VERIFY01/task.json)",
+  "result": "PASSED — exit=0; rc.43 downloaded+verified, installed to ~/newapi-test/new-api, /api/status version=v1.0.0-rc.43, 8/8 functional tests passed (:3021 isolated)",
+  "hk_independent_cross_checks": {
+    "rec_sha256_recomputed": "d20aa712779562c1979746d145dee44269c8edff6a5402ea0731511c19fc4ce2 == REC sha (True)",
+    "gz_sha256_claimed": "ddbed047284d0af73308fb0164ed7a041a3834952004185aefb180b753152871",
+    "gz_sha256_matches_github_release_asset_digest": true,
+    "github_release_asset": "https://github.com/1432151545/newapi-artifacts/releases/download/v61fix-rc43-20261010/new-api-rc43-v61fix.gz (size 41394100)",
+    "bin_sha256_claimed": "ff2a7ff73cfc6a015dc62571c7b103c74aee0ecef78bbc07d3a8d4cd15616388",
+    "bin_sha256_matches_production_newapi_container": true,
+    "note": "The sandbox verified the SAME build that is live in production (v61fix). This supersedes the earlier T-MUSE-V61CHK03 receipt, which had installed the pre-fix build (gz 29413222 / bin 566fba68 — version string not baked)."
+  },
+  "receipt_payload": {
+    "task_id": "T-MUSE-V61VERIFY01",
+    "nonce": "NONCE-MUSE-V61VERIFY01-20261010",
+    "type": "agent",
+    "executor": "muse1",
+    "ts": "2026-10-10T13:16:33",
+    "host": "htch-runtime",
+    "status": "done",
+    "overall_result": "PASSED",
+    "work": "downloaded+verified rc.43 (gz ddbed047..871, bin ff2a7ff7..6388), installed to ~/newapi-test/new-api, /api/status version=v1.0.0-rc.43, 8/8 functional tests passed (:3021 isolated)",
+    "receipt_note": "git receipts repo push BLOCKED (sandbox SSH egress reset by proxy); delivered via rentry outbox per standing fallback. payload: ~/workspace/agent-work/T-MUSE-V61VERIFY01/receipt_payload.json"
+  },
+  "process_notes": [
+    "Agent leg runs hourly on the hour. Task created 2026-10-10T12:14:14Z (20:14 CST); REC ts 13:16:33Z (21:16 CST) = claimed on the 21:00 hourly round.",
+    "STANDING RULE (confirmed by sandbox side 2026-10-10): the git receipts repo (1432151545/newapi-receipts) has NEVER been pushable from the sandbox — its SSH egress is reset by the squid proxy. All agent-task receipts go via the rentry outbox page. Do not expect git-repo receipts from the sandbox."
+  ]
+}
