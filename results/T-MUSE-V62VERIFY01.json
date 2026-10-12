@@ -1,0 +1,104 @@
+{
+  "baselines": {
+    "tasks_repo_commit_msg": "task T-MUSE-V62VERIFY01 (agent/muse1): rc.44 v62 verification",
+    "tasks_repo_head": "a724eba024b9a8881c175c0809fe83f27c4e3779",
+    "test_env_prior_binary_sha": "ff2a7ff73cfc6a015dc62571c7b103c74aee0ecef78bbc07d3a8d4cd15616388",
+    "test_env_prior_note": "v61 (v1.0.0-rc.43) binary installed by T-MUSE-V61VERIFY01 round"
+  },
+  "claimed_at_utc": "2026-10-12T16:33:00Z",
+  "completed_at_utc": "2026-10-12T16:41:24Z",
+  "deliverable": "report.json + ftest62.py + ftest/ in workdir /home/hatch/workspace/agent-work/T-MUSE-V62VERIFY01 (11/11 ftest PASS); v62 binary installed at /home/hatch/newapi-test/new-api",
+  "executor": "muse1",
+  "exit": 0,
+  "functional_summary": {
+    "passed": 11,
+    "total": 11
+  },
+  "functional_tests": [
+    {
+      "detail": "",
+      "ok": true,
+      "test": "service start :3021 (fresh DB)"
+    },
+    {
+      "detail": "http=401",
+      "ok": true,
+      "test": "GET /v1/models without token -> 401"
+    },
+    {
+      "detail": "http=401",
+      "ok": true,
+      "test": "GET /api/user/orders without token -> 401"
+    },
+    {
+      "detail": "'v1.0.0-rc.44'",
+      "ok": true,
+      "test": "GET /api/status data.version == v1.0.0-rc.44"
+    },
+    {
+      "detail": "http=200",
+      "ok": true,
+      "test": "register"
+    },
+    {
+      "detail": "http=200",
+      "ok": true,
+      "test": "admin login"
+    },
+    {
+      "detail": "cid=1",
+      "ok": true,
+      "test": "channel+ability provisioned"
+    },
+    {
+      "detail": "http=200 keylen=48",
+      "ok": true,
+      "test": "token created"
+    },
+    {
+      "detail": "http=200",
+      "ok": true,
+      "test": "chat completion via mock upstream"
+    },
+    {
+      "detail": "rows=1",
+      "ok": true,
+      "test": "usage logged to logs table"
+    },
+    {
+      "detail": "http=200",
+      "ok": true,
+      "test": "GET /api/user/orders with token"
+    }
+  ],
+  "host": "htch-runtime",
+  "key_assertions": {
+    "binary_sha_verified": true,
+    "service_started": true,
+    "status_version": "v1.0.0-rc.44",
+    "version_fix_confirmed": true
+  },
+  "nonce": "NONCE-MUSE-V62VERIFY01-20261013",
+  "notes": [
+    "gz 下载完整（47,326,780 字节，sha256 完全匹配）；curl 不支持该 asset 的断点续传（416），最终为完整一次下载。",
+    "按需拉起策略下 :3000 本轮未启动（v62 在隔离端口 :3021 + 新鲜 SQLite 验证，未动 canonical/v58 恢复语义）；mock :8001 已拉起（为 chat 测试所需）。",
+    "关键断言通过：GET /api/status 的 data.version 明确为 v1.0.0-rc.44（非空）。",
+    "401 鉴权：/v1/models 与 /api/user/orders 无 token 均返回 401；有 token 时 orders 返回 200。"
+  ],
+  "overall_result": "PASSED",
+  "product": {
+    "backup": "/home/hatch/workspace/agent-work/T-MUSE-V62VERIFY01/new-api-backup-pre-v62verify",
+    "binary": "new-api-rc44-v62",
+    "cli_version": "v1.0.0-rc.44",
+    "gz_sha256": "260f602848e338541704152cd94b2ffdb63d9afc7c5a356c744dee415e4bed41",
+    "installed_to": "/home/hatch/newapi-test/new-api",
+    "release_url": "https://github.com/1432151545/newapi-artifacts/releases/download/v62-rc44-20261013/new-api-rc44-v62.gz",
+    "sha256": "838ab61ace5d1306edcf3de3c6c19e2a2cce55681b651571377511bcdcea37df",
+    "size_bytes": 135090338
+  },
+  "report_sha256": "17689783ef0ea88972b77416d02c1f6c5af2c938724fb9bbe7b53616b9fe5859",
+  "status": "done",
+  "task_id": "T-MUSE-V62VERIFY01",
+  "ts": "2026-10-12T16:41:24Z",
+  "type": "agent"
+}
