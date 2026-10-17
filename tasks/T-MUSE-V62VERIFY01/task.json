@@ -5,8 +5,9 @@
   "nonce": "NONCE-MUSE-V62VERIFY01-20261013",
   "timeout": 1800,
   "created": "2026-10-12T16:17:36Z",
-  "note": "NewAPI v1.0.0-rc.44 (v62) autonomous verification by muse1",
+  "note": "COMPLETED 2026-10-12T16:41:24Z (exit=0, sha_ok): muse1 agent autonomously verified NewAPI v1.0.0-rc.44 (v62) — status.version=v1.0.0-rc.44 confirmed, 11/11 tests PASS. Verified & archived to private receipts repo (receipts/ + verification/) and results/ at commit 9cc6711. Expired out of the pending ledger after sandbox-side outbox rotation dropped its REC line from the shared writeback page (causing a phantom overdue). Do not re-run; keep out of pending.",
   "files": {
     "prompt.md": "4a857ae31cafbad392cd68d5a239692efdcb7dbc51f42919b8cdaedbfd04461a"
-  }
+  },
+  "expires": "2026-10-13T00:00:00Z"
 }
