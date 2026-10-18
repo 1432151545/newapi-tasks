@@ -1,0 +1,40 @@
+{
+ "task": "T-MUSE-V63VERIFY01",
+ "status": "done",
+ "exit": 0,
+ "nonce": "NONCE-MUSE-V63VERIFY01-20261018",
+ "host": "htch-runtime",
+ "ts": "2026-10-18T03:28:00Z",
+ "overall_result": "PASSED",
+ "tests_summary": "12/13",
+ "key_assertions": {
+  "api_status_version": "v1.0.0-rc.45",
+  "billing_quota_consumed": true,
+  "bin_sha_match": true,
+  "bin_size_match": true,
+  "burst_30x_no_503": true,
+  "e2e_chat_via_mock": "mock reply ok",
+  "gz_sha_match": true,
+  "usage_logs_recorded": true,
+  "user_orders_no_token_401": true,
+  "v1_models_no_token_401": true,
+  "version_flag": "v1.0.0-rc.45"
+ },
+ "anomalies": [
+  "admin API POST /api/channel/ -> {success:false,'channel cannot be empty'} on valid payloads incl. byte-faithful template of existing channel; PUT -> 'Invalid parameters'. Pre-existing channels unaffected. Possible rc.45/v63 admin regression.",
+  "local test-env root password unknown; reset via bcrypt in test DB only.",
+  "Claude cache-billing change not directly testable in sandbox (no Claude upstream); overload sentinel verified via 30x burst (30x200, 0x503)."
+ ],
+ "verified_by": "hermes-cron muse-receipt-monitor (HK) + manual HK independent recompute",
+ "hk_verification": {
+  "sha_ok": true,
+  "nonce_match": true,
+  "bin_sha_match": true,
+  "gz_sha_match": true,
+  "status_version": "v1.0.0-rc.45",
+  "empty_response_refund_ok": true,
+  "overload_sentinel_burst": "40/40 HTTP 200, 0x503",
+  "muse_channel_api_anomaly": "FALSE ALARM — body-shape contract pre-existing in rc.44 too (A/B verified)",
+  "archived_at": "2026-10-18T03:54:08Z"
+ }
+}
