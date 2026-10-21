@@ -1,0 +1,10 @@
+{
+  "id": "T-MUSE-V64VERIFY01",
+  "type": "agent",
+  "target": "muse1",
+  "nonce": "NONCE-MUSE-V64VERIFY01-20261022",
+  "timeout": 1800,
+  "created": "2026-10-21T22:55:29Z",
+  "note": "verify NewAPI v1.0.0-rc.46 + v64 patches (Go 1.26.10 / CVE-2026-111943)",
+  "files": {"prompt.md": "96c7a5901cc99ea0c8f47c0f23c43cff7c5b2ae6cddc5aaa831785d46a5591f1"}
+}
