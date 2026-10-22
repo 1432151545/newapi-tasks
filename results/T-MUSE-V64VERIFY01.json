@@ -1,0 +1,41 @@
+{
+ "task": "T-MUSE-V64VERIFY01",
+ "status": "done",
+ "exit": 0,
+ "nonce": "NONCE-MUSE-V64VERIFY01-20261022",
+ "host": "htch-runtime",
+ "ts": "2026-10-22T03:23:07Z",
+ "overall_result": "PASSED (binary identity + patch set + toolchain CONFIRMED by HK); 5/17 subsystem tests blocked by sandbox env",
+ "tests_summary": "12/17 (5 fails share one environmental root cause)",
+ "key_assertions": {
+  "bin_sha_match": true,
+  "bin_size_match": true,
+  "gz_sha_match": true,
+  "go_version_embedded": "go1.26.10",
+  "patch_markers": {
+   "reapplyEmptyResponseRefund": 1,
+   "MarkUserSubscriptionsExhausted": 1,
+   "upstreamHungWithoutFirstByte": 1,
+   "sql_judgement": 2,
+   "免单": 2
+  },
+  "migration_clean": true,
+  "hk_crosscheck": "CONFIRMED — recomputed against local build artifact /root/newapi/build64/new-api-rc46-v64 (bin sha 1d71a92d…, size 136626338, gz sha 8ee18da4…, go1.26.10, markers all match)"
+ },
+ "anomalies": [
+  "5/17 tests blocked: sandbox host memory 91.9-92.3% > 90% threshold -> 503 system_memory_overloaded on every chat completion (env sentinel true-positive; container RSS only ~298MB; no in-sandbox remedy).",
+  "products (report.json / run_tests.py / test_results.json) delivered as path+sha256 only, no inline bytes -> HK cannot independently recompute their contents (sandbox has no inbound).",
+  "RESOLVED (V63 anomaly): 'channel cannot be empty' confirmed by Muse to be a payload-shape error ({mode:single,channel:{...}}), NOT an rc.45/v63 admin regression."
+ ],
+ "verified_by": "hermes-cron muse-receipt-monitor (HK) + manual HK independent recompute",
+ "hk_verification": {
+  "sha_ok": true,
+  "nonce_match": true,
+  "bin_sha_match": true,
+  "gz_sha_match": true,
+  "go_version_embedded": "go1.26.10",
+  "patch_markers_match": true,
+  "receipt_artifacts": "path+sha256 only (no inline bytes) — products not independently recomputable",
+  "archived_private_repo": "1432151545/newapi-receipts receipts+verification/T-MUSE-V64VERIFY01.*"
+ }
+}
