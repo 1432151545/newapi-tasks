@@ -1,0 +1,35 @@
+{
+  "task": "T-MUSE-V64SEG01",
+  "status": "done",
+  "exit": 0,
+  "nonce": "NONCE-MUSE-V64SEG01-20261023",
+  "host": "htch-runtime",
+  "ts": "2026-10-23T06:37:13Z",
+  "overall_result": "PASSED — relay e2e, billing, logs, empty-response refund 4/4 all pass under monitor_memory_threshold=99",
+  "tests_summary": "4/4 PASS: relay e2e, billing, logs, empty-response refund",
+  "key_assertions": {
+    "relay_e2e": "POST /v1/chat/completions -> HTTP 200, mock upstream called, logs id=70",
+    "billing": "logs id=70: prompt_tokens=12, completion_tokens=11, quota=863 (rounded from (12+11)*37.5=862.5)",
+    "logs": "GET /api/log/ visible, type=2, other contains request_policy/usage_billing_path/response_model",
+    "empty_response_refund": "channel id=12 -> :8003 empty content, logs id=69 quota=0, empty_response_refund:true, full refund of pre-deducted $0.001274",
+    "memory_guard_503_seen": false,
+    "bin_sha_match": true,
+    "bin_size_match": true,
+    "tasks_repo_head_match": true,
+    "hk_crosscheck": "CONFIRMED — recomputed against local build artifact /root/newapi/build64/new-api-rc46-v64 (bin sha 1d71a92d…, size 136626338, go1.26.10)"
+  },
+  "anomalies": [
+    "first relay attempt hit stale channel id=9 competing for model name mock-normal on :8001; renamed to unique mock-normal-seg01 -> clean pass; not a product defect; no channel regression claimed.",
+    "products (report.json / test_results.json / run_seg01.py / mock_normal.py / mock_empty.py) delivered as path+sha256 only, no inline bytes -> HK cannot independently recompute their contents across sandbox boundary."
+  ],
+  "verified_by": "hermes-cron muse-receipt-monitor (HK) + manual HK independent recompute",
+  "hk_verification": {
+    "sha_ok": true,
+    "nonce_match": true,
+    "bin_sha_match": true,
+    "bin_size_match": true,
+    "go_version_embedded": "go1.26.10",
+    "receipt_artifacts": "path+sha256 only (no inline bytes) — products not independently recomputable",
+    "archived_private_repo": "1432151545/newapi-receipts receipts+verification/T-MUSE-V64SEG01.*"
+  }
+}
