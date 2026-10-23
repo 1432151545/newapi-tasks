@@ -124,7 +124,11 @@ def main():
                 try:
                     cur = gh("GET", "/contents/" + path, raw=True)
                     got = base64.b64decode(json.loads(cur.decode())["content"].replace("\n", ""))
-                    if got != data:
+                    if path.endswith(".json"):
+                        differs = (json.loads(got) != json.loads(data))
+                    else:
+                        differs = (got != data)
+                    if differs:
                         problems.append("%s present but differs (kept sandbox copy)" % path)
                 except Exception as e:
                     problems.append("%s readback failed: %s" % (path, str(e)[:80]))
