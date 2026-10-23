@@ -190,11 +190,13 @@ def parse(rec):
             "type": g("type"), "ts": g("ts"), "host": g("host")}
     try:
         payload = rec.split("|data=")[1]
-        r = json.loads(base64.urlsafe_b64decode(payload + "=" * (-len(payload) % 4)))
+        raw = base64.urlsafe_b64decode(payload + "=" * (-len(payload) % 4))
+        r = json.loads(raw)
         given = g("sha")
         computed = hashlib.sha256(json.dumps(r, ensure_ascii=False).encode()).hexdigest()
+        raw_hash = hashlib.sha256(raw).hexdigest()
         info["payload"] = r
-        info["sha_ok"] = (computed == given)
+        info["sha_ok"] = (computed == given or raw_hash == given)
     except Exception as e:
         info["sha_ok"] = False
         info["err"] = str(e)[:60]
