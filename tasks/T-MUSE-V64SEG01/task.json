@@ -1,0 +1,10 @@
+{
+  "id": "T-MUSE-V64SEG01",
+  "type": "agent",
+  "target": "muse1",
+  "nonce": "NONCE-MUSE-V64SEG01-20261023",
+  "timeout": 1800,
+  "created": "2026-10-23T06:20:57Z",
+  "note": "v64 supplementary batch 1/2: relay e2e / billing / logs / empty-response refund (the 4 env-503-blocked items)",
+  "files": {"prompt.md": "661994ff14a9ca4b614a770819dd3fb24f58f2a52a2b0765fca691d08f0a4fc8"}
+}
