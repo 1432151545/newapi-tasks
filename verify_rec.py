@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """跨通道核验沙箱回执（HK 侧独立复算，不采信任何自报数字）。
 
-通道：ntfy（主，append-only、无 Cloudflare）+ rentry outbox（历史/回落）。
+通道：git 私库 newapi-receipts/receipts/*.rec（主，2026-10-23 起）
+      + rentry outbox（存量/回落）+ ntfy（历史，已死）。
 核验：解 data → 重算 sha256(json) → 与 REC 自带 sha 比对；并核对 nonce/exit/host。
 
 用法:
@@ -111,6 +112,78 @@ def from_rentry():
     return out
 
 
+# ---- 回执主通道：私库 git（2026-10-23 起，沙箱 SSH 22 出网已通）------------------
+# 沙箱 agent executor 现在直接把 REC push 到私库 1432151545/newapi-receipts 的
+# receipts/<id>.rec（+ 同 payload 的 .json）；不再往 rentry outbox 写回执
+# （rentry outbox 只剩 HB 心跳行）。读取优先走本地只读克隆（先 git pull 收敛），
+# 克隆缺失或 pull 失败时回退 GitHub Contents API（私库需带 token）。
+GIT_RECEIPTS_CLONE = "/root/gitbus-receipts"
+GIT_RECEIPTS_SLUG = "1432151545/newapi-receipts"
+TOKEN_PATH = "/root/.hermes-gitbus/token"
+
+
+def _gh_token():
+    try:
+        return open(TOKEN_PATH, encoding="utf-8").read().strip()
+    except Exception:
+        return ""
+
+
+def _git_pull(clone):
+    import subprocess
+    try:
+        r = subprocess.run(["git", "-C", clone, "pull", "--ff-only", "--quiet"],
+                           capture_output=True, timeout=90)
+        return r.returncode == 0
+    except Exception:
+        return False
+
+
+def _recs_from_text(txt):
+    return [l.rstrip("\n") for l in txt.splitlines() if l.startswith("REC|")]
+
+
+def _from_git_api():
+    """克隆不可用时的回退：Contents API（raw）逐条读 receipts/*.rec。"""
+    tok = _gh_token()
+    if not tok:
+        return []
+    out = []
+    hdrs = {"User-Agent": "hermes-vr", "Authorization": "token " + tok}
+    try:
+        req = urllib.request.Request(
+            "https://api.github.com/repos/%s/contents/receipts" % GIT_RECEIPTS_SLUG, headers=hdrs)
+        items = json.loads(urllib.request.urlopen(req, timeout=60).read())
+        for it in items:
+            if not it["name"].endswith(".rec"):
+                continue
+            r2 = urllib.request.Request(it["url"],
+                                        headers=dict(hdrs, Accept="application/vnd.github.raw"))
+            out += _recs_from_text(urllib.request.urlopen(r2, timeout=60).read()
+                                   .decode("utf-8", "replace"))
+    except Exception as e:
+        print("  ! git(API) 读失败: %s" % str(e)[:90], file=sys.stderr)
+    return out
+
+
+def from_git():
+    """私库 git 的 REC 全集（主通道）。本地克隆优先，失败回退 API。"""
+    d = os.path.join(GIT_RECEIPTS_CLONE, "receipts")
+    if os.path.isdir(os.path.join(GIT_RECEIPTS_CLONE, ".git")):
+        _git_pull(GIT_RECEIPTS_CLONE)
+        out = []
+        try:
+            for fn in sorted(os.listdir(d)):
+                if fn.endswith(".rec"):
+                    out += _recs_from_text(open(os.path.join(d, fn), encoding="utf-8",
+                                                errors="replace").read())
+            if out:
+                return out
+        except Exception as e:
+            print("  ! git(clone) 读失败: %s" % str(e)[:90], file=sys.stderr)
+    return _from_git_api()
+
+
 def parse(rec):
     g = lambda k: (re.search(k + r"=([^|]+)", rec) or [None, "?"])[1]
     info = {"task": g("task"), "nonce": g("nonce"), "exit": g("exit"),
@@ -163,7 +236,7 @@ def main():
     print("=== 核验（HK 侧独立复算）===")
     print("ntfy topic: %s" % (t or "(未配置)"))
     recs = {}
-    for src, arr in (("ntfy", from_ntfy(t)), ("rentry", from_rentry())):
+    for src, arr in (("ntfy", from_ntfy(t)), ("git", from_git()), ("rentry", from_rentry())):
         for rec in arr:
             i = parse(rec)
             # 同一任务保留 ts 较新的那条

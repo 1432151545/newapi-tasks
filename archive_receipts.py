@@ -2,8 +2,9 @@
 """HK 侧独立核验 + 归档 Muse 回执到私库 1432151545/newapi-receipts (Contents API)。
 
 用法: archive_receipts.py T-MUSE-XXX [T-MUSE-YYY ...]
-流程: 读回写页 REC → 整体 sha_ok → nonce 对本地 task.json → 解 artifacts
-      → 复算每文件 sha256/bytes → 写 receipts/<id>.json|.rec + verification/<id>.json
+流程: 读回执（git 私库 receipts/*.rec 为主 + rentry 存量兜底）→ 整体 sha_ok
+      → nonce 对本地 task.json → 解 artifacts → 复算每文件 sha256/bytes
+      → 写 verification/<id>.json（receipts/ 已由沙箱 executor 自己 push，缺才补、不覆盖）
       → GET 回读逐字节确认。已归档(verification/<id>.json 在库内)则跳过。
 """
 import base64
@@ -38,7 +39,7 @@ def main():
     existing = {x["path"]: x for x in tree.get("tree", [])}
 
     recs = {}
-    for line in vr.from_rentry():
+    for line in list(vr.from_git()) + list(vr.from_rentry()):
         i = vr.parse(line)
         old = recs.get(i["task"])
         if not old or (i["ts"] or "") >= (old.get("ts") or ""):
@@ -99,7 +100,7 @@ def main():
             "task": tid,
             "verified_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
             "verified_by": "hermes-cron muse-receipt-monitor (HK side, independent recompute)",
-            "source": "rentry writeback page %s" % vr._conf(vr.BUSINFO).get("slug", "?"),
+            "source": "git private repo 1432151545/newapi-receipts receipts/%s.rec (rentry outbox = legacy fallback)" % tid,
             "sha_ok": checks["sha_ok"],
             "nonce_match": checks["nonce_match"],
             "host": checks["host"],
@@ -112,11 +113,23 @@ def main():
         }
 
         files = {
-            "receipts/%s.json" % tid: json.dumps(payload, ensure_ascii=False, indent=2).encode(),
-            "receipts/%s.rec" % tid: r["raw"].encode(),
             "verification/%s.json" % tid: json.dumps(ver, ensure_ascii=False, indent=2).encode(),
         }
         problems = []
+        # receipts/*: 2026-10-23 起由沙箱 executor 自己 push（它 push 失败就不会有回执），
+        # HK 只在缺失时补写、绝不覆盖——避免与沙箱的 push 互相打架（非快进/409）。
+        for path, data in (("receipts/%s.json" % tid, json.dumps(payload, ensure_ascii=False, indent=2).encode()),
+                           ("receipts/%s.rec" % tid, r["raw"].encode())):
+            if path in existing:
+                try:
+                    cur = gh("GET", "/contents/" + path, raw=True)
+                    got = base64.b64decode(json.loads(cur.decode())["content"].replace("\n", ""))
+                    if got != data:
+                        problems.append("%s present but differs (kept sandbox copy)" % path)
+                except Exception as e:
+                    problems.append("%s readback failed: %s" % (path, str(e)[:80]))
+                continue
+            files[path] = data
         for path, data in files.items():
             try:
                 body = {"message": "archive %s" % path, "content": base64.b64encode(data).decode()}
