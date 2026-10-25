@@ -1,0 +1,45 @@
+{
+ "task": "T-MUSE-V65VERIFY01",
+ "status": "done",
+ "exit": 0,
+ "nonce": "NONCE-MUSE-V65VERIFY01-20261025",
+ "host": "htch-runtime",
+ "ts": "2026-10-25T10:38:17Z",
+ "claimed_at": "2026-10-25T10:33:00Z",
+ "overall_result": "PASSED (binary identity + patch set + toolchain CONFIRMED by HK independent recompute; Muse 5/5 functional PASS; production already on rc.47+v65)",
+ "tests_summary": "5/5 PASS on Muse (relay e2e, billing, logs, empty-response refund non-stream, regression billing); 0 env-blocked this round (previous round's memory-guard 503 did not recur: memory_guard_503_seen=false)",
+ "key_assertions": {
+  "bin_sha_match": true,
+  "bin_size_match": true,
+  "gz_sha_match": true,
+  "go_version_embedded": "go1.26.10",
+  "patch_markers": {
+   "reapplyEmptyResponseRefund": 1,
+   "MarkUserSubscriptionsExhausted": 1,
+   "upstreamHungWithoutFirstByte": 1,
+   "sql_judgement": 2,
+   "免单": 2
+  },
+  "migration_clean": true,
+  "version_flag_and_api_status": "v1.0.0-rc.47 (both, non-empty)",
+  "empty_response_refund_nonstream": "logs id=2 quota=0, other.empty_response_refund=true, token quota unchanged 999137 -> 999137",
+  "regression_billing": "logs id=3 quota=863, no refund marker, token billed 999137 -> 998274",
+  "hk_crosscheck": "CONFIRMED — recomputed against local build artifact /root/newapi/build65/new-api-rc47-v65 (bin sha b458b89e…, size 136704162, gz sha 3b78595c…, go1.26.10, markers all match); production /api/status data.version observed = v1.0.0-rc.47"
+ },
+ "anomalies": [
+  "Muse self-reported two harness-config failures before the passing run (fresh DB missing SelfUseModeEnabled -> 400; fresh root quota=0 -> 403), fixed with the same values as the main test DB. Self-assessed as harness config, not product defect — consistent with the observed logs (no channel-regression claim made).",
+  "products (report.json / test_results.json / run_v65.py / mock_*.py) delivered as path+sha256 only, no inline bytes -> HK cannot independently recompute their contents (sandbox has no inbound). HK verdict therefore rests on the local build artifact recompute, not on Muse's own test claims."
+ ],
+ "verified_by": "hermes-cron muse-receipt-monitor (HK) + HK independent recompute",
+ "hk_verification": {
+  "sha_ok": true,
+  "nonce_match": true,
+  "bin_sha_match": true,
+  "gz_sha_match": true,
+  "go_version_embedded": "go1.26.10",
+  "patch_markers_match": true,
+  "production_status_version": "v1.0.0-rc.47",
+  "receipt_artifacts": "path+sha256 only (no inline bytes) — products not independently recomputable",
+  "archived_private_repo": "1432151545/newapi-receipts receipts+verification/T-MUSE-V65VERIFY01.*"
+ }
+}
