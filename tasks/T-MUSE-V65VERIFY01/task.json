@@ -1,0 +1,10 @@
+{
+  "id": "T-MUSE-V65VERIFY01",
+  "type": "agent",
+  "target": "muse1",
+  "nonce": "NONCE-MUSE-V65VERIFY01-20261025",
+  "timeout": 3600,
+  "created": "2026-10-25T10:23:30Z",
+  "note": "rc.47 + v65 independent verification (identity/markers/toolchain/relay/empty-refund non-stream)",
+  "files": {"prompt.md": "0109f21ed3fc7d7d9b224e31b3f955537385ba67a080f2d49c52513ed0a84100"}
+}
