@@ -1,0 +1,46 @@
+{
+  "task": "T-MUSE-V66VERIFY01",
+  "status": "done",
+  "exit": 0,
+  "nonce": "NONCE-MUSE-V66VERIFY01-20261105",
+  "host": "htch-runtime",
+  "ts": "2026-11-04T18:09:58Z",
+  "claimed_at": "2026-11-04T18:04:00Z",
+  "overall_result": "PASSED (binary identity + patch set + toolchain CONFIRMED by HK independent recompute; Muse 5/5 functional PASS self-reported; production already on rc.48+v66)",
+  "tests_summary": "5/5 PASS on Muse (relay e2e, billing, logs, empty-response refund non-stream, regression billing)",
+  "key_assertions": {
+    "bin_sha_match": true,
+    "bin_size_match": true,
+    "gz_sha_match": true,
+    "go_version_embedded": "go1.26.10",
+    "patch_markers": {
+      "reapplyEmptyResponseRefund": 1,
+      "MarkUserSubscriptionsExhausted": 1,
+      "upstreamHungWithoutFirstByte": 1,
+      "sql_judgement": 2,
+      "免单": 2
+    },
+    "migration_clean": true,
+    "version_flag_and_api_status": "v1.0.0-rc.48 (both, non-empty)",
+    "empty_response_refund_nonstream": "logs id=2 quota=0, other.empty_response_refund=true, token quota unchanged 999137 -> 999137",
+    "regression_billing": "logs id=3 quota=863, no refund marker, token billed 999137 -> 998274",
+    "hk_crosscheck": "CONFIRMED — recomputed against local build artifact /root/newapi/build66/new-api-rc48-v66 AND the anonymously downloaded release asset (gz sha 7a2315ac… 48070477 B, gunzip -> bin ca43de85… 137261218 B), go1.26.10, markers 1/1/1/2/2 all match; production /api/status data.version observed = v1.0.0-rc.48; running container new-api:emptyrefund-rc48-v66 /new-api sha = ca43de85… identical"
+  },
+  "anomalies": [
+    "Muse self-reported: run1 400 price-not-configured on fresh DB (missing SelfUseModeEnabled) = harness config, fixed; harness self-kill during restart recovered via script-file restart; one stray v1.0.0-rc.46 token in the strings blob (HK reproduced: rc.46 x1 vs rc.48 x4 — cosmetic, not a version-identity defect).",
+    "Muse delivered only report_path (no inline bytes) -> its functional test contents are NOT independently recomputable by HK (sandbox has no inbound). HK verdict rests on the local build artifact + release asset recompute, not on Muse's own test claims."
+  ],
+  "verified_by": "hermes-cron muse-receipt-monitor (HK) + HK independent recompute",
+  "hk_verification": {
+    "sha_ok": true,
+    "nonce_match": true,
+    "bin_sha_match": true,
+    "gz_sha_match": true,
+    "go_version_embedded": "go1.26.10",
+    "patch_markers_match": true,
+    "production_status_version": "v1.0.0-rc.48",
+    "receipt_artifacts": "report_path only (no inline bytes) — products not independently recomputable",
+    "archived_private_repo": "1432151545/newapi-receipts receipts+verification/T-MUSE-V66VERIFY01.*"
+  },
+  "note_extra": "HK 只在私库写 verification/；receipts/* 由沙箱 executor 推送，已逐字节回读一致（仅行尾换行的 rstrip 差异，属归档器比对口径）"
+}
