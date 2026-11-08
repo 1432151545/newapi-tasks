@@ -1,0 +1,45 @@
+{
+  "task": "T-MUSE-V67VERIFY01",
+  "status": "done",
+  "exit": 0,
+  "nonce": "NONCE-MUSE-V67VERIFY01-20261108",
+  "host": "htch-runtime",
+  "ts": "2026-11-08T08:09:49Z",
+  "claimed_at": "2026-11-08T08:03:30Z",
+  "overall_result": "PASSED (binary identity + patch set + toolchain CONFIRMED by HK independent recompute; Muse 5/5 functional PASS self-reported; production already on rc.49+v67)",
+  "tests_summary": "5/5 PASS: relay e2e, billing, logs, empty-response refund (non-stream), regression billing; email-ATO bonus not reproducible on SQLite (expected)",
+  "key_assertions": {
+    "bin_sha_match": true,
+    "bin_size_match": true,
+    "gz_sha_match": true,
+    "go_version_embedded": "go1.26.10",
+    "patch_markers": {
+      "reapplyEmptyResponseRefund": 1,
+      "MarkUserSubscriptionsExhausted": 1,
+      "upstreamHungWithoutFirstByte": 1,
+      "sql_judgement": 2,
+      "免单": 2
+    },
+    "version_flag_and_api_status": "v1.0.0-rc.49 (both, non-empty)",
+    "empty_response_refund_nonstream": "logs id=2 quota=0, other contains empty_response_refund, token quota unchanged 999137 -> 999137",
+    "regression_billing": "logs id=3 quota=863, no refund marker, token billed 999137 -> 998274",
+    "email_ato_fix": "not reproducible on SQLite (BINARY collation does not fold q+U+0301); expected per prompt, not scored as failure",
+    "hk_crosscheck": "CONFIRMED — recomputed against local build artifact /root/newapi/build67/new-api-rc49-v67 AND the anonymously downloaded release asset (gz sha be881e3d… 48111548 B, gunzip -> bin f0af9fa7… 137334946 B), go1.26.10, markers 1/1/1/2/2 all match; production /api/status data.version observed = v1.0.0-rc.49; running container new-api:emptyrefund-rc49-v67 /new-api sha = f0af9fa7… identical"
+  },
+  "anomalies": [
+    "Muse self-reported: host mem 91.7-92.6% during the run (no 503 on the fresh :3100 instance); ATO phase harness NameError, ATO phase re-run standalone while core phases were not re-run; email-ATO folding not reproducible on SQLite as the prompt anticipated.",
+    "Muse delivered only report_path (no inline bytes) -> its functional test contents are NOT independently recomputable by HK (sandbox has no inbound). HK verdict rests on the local build artifact + release asset + running production container recompute, not on Muse's own test claims."
+  ],
+  "verified_by": "hermes-cron muse-receipt-monitor (HK) + HK independent recompute",
+  "hk_verification": {
+    "sha_ok": true,
+    "nonce_match": true,
+    "bin_sha_match": true,
+    "gz_sha_match": true,
+    "go_version_embedded": "go1.26.10",
+    "patch_markers_match": true,
+    "production_status_version": "v1.0.0-rc.49",
+    "receipt_artifacts": "report_path only (no inline bytes)",
+    "verdict": "CONFIRMED"
+  }
+}
