@@ -1,0 +1,10 @@
+{
+  "id": "T-MUSE-V68VERIFY01",
+  "type": "agent",
+  "target": "muse1",
+  "nonce": "NONCE-MUSE-V68VERIFY01-20261113",
+  "timeout": 1800,
+  "created": "2026-11-13T15:08:08Z",
+  "note": "rc51+v68 production artifact independent verification",
+  "files": {"prompt.md": "ba72ec9b5df8c6c91f372e1db14a5646e123a6b670ad493c6f6c89160ca5723d"}
+}
