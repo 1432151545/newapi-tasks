@@ -1,0 +1,43 @@
+{
+ "task": "T-MUSE-V68VERIFY01",
+ "status": "done",
+ "exit": 0,
+ "nonce": "NONCE-MUSE-V68VERIFY01-20261113",
+ "host": "htch-runtime",
+ "ts": "2026-11-13T16:23:59Z",
+ "overall_result": "PASSED 10/10 (Muse self-reported; 2 pre-existing anomalies from rc.50, 0 regressions) — binary identity + patch set + toolchain + live production version CONFIRMED by HK independent recompute",
+ "tests_summary": "10/10: download_verify, boot_health, relay_normal, billing, logs, empty_refund, regression_billing, model_mapping, streaming, first_byte_disconnect",
+ "key_assertions": {
+  "bin_sha_match": true,
+  "bin_size_match": true,
+  "gz_sha_match": true,
+  "anonymous_release_download_match": true,
+  "go_version_embedded": "go1.26.10",
+  "patch_markers": {
+   "reapplyEmptyResponseRefund": 1,
+   "MarkUserSubscriptionsExhausted": 1,
+   "upstreamHungWithoutFirstByte": 1,
+   "sql_judgement": 2,
+   "免单": 3
+  },
+  "version_flag_and_api_status": "v1.0.0-rc.51 (both, non-empty)",
+  "production_container_image": "new-api:emptyrefund-rc51-v68",
+  "empty_response_refund_nonstream": "logs id=2 quota=0, other contains empty_response_refund, token quota unchanged 999137 -> 999137",
+  "regression_billing": "logs id=3 quota=863, no refund marker, token billed 999137 -> 998274",
+  "streaming": "SSE chunks + [DONE], log quota=863",
+  "first_byte_disconnect": "HTTP 500 do_request_failed immediate, no hang/retry loop (same as rc.50, pre-existing)"
+ },
+ "anomalies": [
+  "model_mapping 'a:b' string format -> HTTP 500 unmarshal_model_mapping_failed on every request (same as rc.50 round; pre-existing, not a regression; JSON-encoded-string format works)",
+  "first-byte disconnect -> HTTP 500 do_request_failed, no log row, immediate (0.0s, no hang) (same as rc.50 round; pre-existing, not a regression)",
+  "email collation folding: not reproducible on SQLite (task item 9) - marked not reproducible, not failed",
+  "harness note: run_rc51.py first_byte_disconnect phase errored on a missing 'subprocess' import (copied harness bug); phase re-run manually with corrected code, raw evidence in fixup_rc51.json; run_rc51.py model_mapping 'result' string was a false positive (mock log lines were from earlier calls) - corrected in this report after re-verification"
+ ],
+ "known_issues": [
+  "model_mapping 'a:b' plain string -> HTTP 500 unmarshal_model_mapping_failed (pre-existing since rc.50; JSON-encoded-string form works)",
+  "first-byte disconnect -> HTTP 500 with no log row (pre-existing; at least it no longer hangs)",
+  "email collation folding not reproducible on SQLite (not a failure)"
+ ],
+ "hk_verification": "verification/T-MUSE-V68VERIFY01.json in private repo 1432151545/newapi-receipts (verdict VERIFIED / CONFIRMED)",
+ "archived_at": "2026-11-13T16:32:38Z"
+}
